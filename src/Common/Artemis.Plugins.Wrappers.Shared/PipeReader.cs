@@ -11,55 +11,39 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
         private readonly NamedPipeServerStream _pipe;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly Task _listenerTask;
-        private readonly int _initialArraySize;
+        private readonly byte[] _buffer;
 
         public event EventHandler<ReadOnlyMemory<byte>> CommandReceived;
         public event EventHandler<Exception> Exception;
         public event EventHandler Disconnected;
 
-        public PipeReader(NamedPipeServerStream pipe, int initialArraySize)
+        public PipeReader(NamedPipeServerStream pipe)
         {
             _pipe = pipe;
             _cancellationTokenSource = new();
             _listenerTask = Task.Run(ReadLoop);
-            _initialArraySize = initialArraySize;
+            _buffer = new byte[_pipe.InBufferSize];
         }
 
-        private async Task ReadLoop()
+        private void ReadLoop()
         {
             while (!_cancellationTokenSource.IsCancellationRequested && _pipe.IsConnected)
             {
-                int initialArraySize = _initialArraySize;
-                byte[] rented = ArrayPool<byte>.Shared.Rent(initialArraySize);
-
                 try
                 {
                     int position = 0;
                     do
                     {
-                        if (position >= rented.Length)
-                        {
-                            //we need to allocate a new buffer and copy over the data.
-                            initialArraySize *= 2;
-                            var newRented = ArrayPool<byte>.Shared.Rent(initialArraySize);
-                            Array.Copy(rented, newRented, rented.Length);
-                            ArrayPool<byte>.Shared.Return(rented);
-                            rented = newRented;
-                        }
-
-                        position += await _pipe.ReadAsync(rented.AsMemory(position), _cancellationTokenSource.Token).ConfigureAwait(false);
+                        position += _pipe.Read(_buffer, position, _buffer.Length - position);
                     } while (!_pipe.IsMessageComplete);
 
                     if (position == 0)
                     {
-                        //I don't know why, but this happens when closing the pipe.
-                        //return the buffer to the pool and skip the rest
-                        ArrayPool<byte>.Shared.Return(rented);
                         continue;
                     }
 
-                    var dataLength = (int)BitConverter.ToUInt32(rented, 0);
-                    var actualData = rented.AsMemory(4, dataLength - 4);
+                    var dataLength = (int)BitConverter.ToUInt32(_buffer, 0);
+                    var actualData = _buffer.AsMemory(4, dataLength - 4);
 
                     CommandReceived?.Invoke(this, actualData);
                 }
@@ -67,12 +51,8 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
                 {
                     Exception?.Invoke(this, e);
                 }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(rented);
-                }
             }
-            await _pipe.DisposeAsync();
+            _pipe.Dispose();
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
 

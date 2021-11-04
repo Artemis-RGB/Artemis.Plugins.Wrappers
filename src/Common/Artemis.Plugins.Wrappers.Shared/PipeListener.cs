@@ -13,7 +13,7 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
     public class PipeListener : IDisposable
     {
         private readonly string _pipeName;
-        private readonly int _initialBufferSize;
+        private readonly int _bufferSize;
         private readonly Task _task;
         private readonly CancellationTokenSource _tokenSource;
         private readonly List<PipeReader> _readers;
@@ -23,10 +23,10 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
         public event EventHandler<ReadOnlyMemory<byte>> CommandReceived;
         public event EventHandler<Exception> Exception;
 
-        public PipeListener(string pipeName, int initialBufferSize)
+        public PipeListener(string pipeName, int bufferSize)
         {
             _pipeName = pipeName;
-            _initialBufferSize = initialBufferSize;
+            _bufferSize = bufferSize;
             _tokenSource = new();
             _readers = new();
             _task = Task.Run(Loop);
@@ -48,13 +48,13 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
                         NamedPipeServerStream.MaxAllowedServerInstances,
                         PipeTransmissionMode.Message,
                         PipeOptions.Asynchronous,
-                        0,
+                        _bufferSize,
                         0,
                         pipeSecurity);
 
                     await pipeStream.WaitForConnectionAsync(_tokenSource.Token).ConfigureAwait(false);
 
-                    PipeReader reader = new(pipeStream, _initialBufferSize);
+                    PipeReader reader = new(pipeStream);
                     reader.CommandReceived += OnReaderCommandReceived;
                     reader.Disconnected += OnReaderDisconnected;
                     reader.Exception += OnReaderException;
