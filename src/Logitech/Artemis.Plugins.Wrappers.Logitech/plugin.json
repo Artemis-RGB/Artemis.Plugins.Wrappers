@@ -1,0 +1,7 @@
+{
+  "Guid": "c6dda69b-f45a-496c-9d1b-fce915c96869",
+  "Name": "Logitech Wrapper",
+  "Description": "Allows you to use Logitech Lightsync integration on all Artemis supported devices",
+  "Version": "1.0.0.0",
+  "Main": "Artemis.Plugins.Wrappers.Logitech.dll"
+}

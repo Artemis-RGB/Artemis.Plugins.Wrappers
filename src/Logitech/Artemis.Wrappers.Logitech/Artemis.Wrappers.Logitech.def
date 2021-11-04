@@ -1,0 +1,33 @@
+LIBRARY Artemis.Wrappers.Logitech.dll
+
+EXPORTS
+	LogiLedInit
+	LogiLedInitWithName
+	LogiGetConfigOptionNumber
+	LogiGetConfigOptionBool
+	LogiGetConfigOptionColor
+	LogiGetConfigOptionRect
+	LogiGetConfigOptionRange
+	LogiGetConfigOptionSelect
+	LogiGetConfigOptionKeyInput
+	LogiSetConfigOptionLabel
+	LogiLedSetTargetDevice
+	LogiLedSaveCurrentLighting
+	LogiLedSetLighting
+	LogiLedRestoreLighting
+	LogiLedFlashLighting
+	LogiLedPulseLighting
+	LogiLedExcludeKeysFromBitmap
+	LogiLedSetLightingFromBitmap
+	LogiLedSetLightingForKeyWithScanCode
+	LogiLedSetLightingForKeyWithHidCode
+	LogiLedSetLightingForKeyWithQuartzCode
+	LogiLedSetLightingForKeyWithKeyName
+	LogiLedSetLightingForTargetZone
+	LogiLedPulseSingleKey
+	LogiLedFlashSingleKey
+	LogiLedStopEffectsOnKey
+	LogiLedSaveLightingForKey
+	LogiLedRestoreLightingForKey
+	LogiLedStopEffects
+	LogiLedShutdown

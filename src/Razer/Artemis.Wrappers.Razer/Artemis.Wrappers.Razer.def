@@ -1,0 +1,18 @@
+LIBRARY Artemis.Wrappers.Razer.dll
+
+EXPORTS
+	Init
+	InitSDK
+	UnInit
+	CreateEffect
+	SetEffect
+	DeleteEffect
+	RegisterEventNotification
+	UnregisterEventNotification
+	CreateChromaLinkEffect
+	CreateKeyboardEffect
+	CreateMouseEffect
+	CreateHeadsetEffect
+	CreateMousepadEffect
+	CreateKeypadEffect
+	QueryDevice

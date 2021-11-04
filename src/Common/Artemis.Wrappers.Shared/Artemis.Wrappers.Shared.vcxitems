@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{7dfdb138-424a-427c-8b4b-f355802e476d}</ItemsProjectGuid>
+    <ItemsProjectName>Artemis.Wrappers.Shared</ItemsProjectName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ArtemisBuffer.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ArtemisFixedBuffer.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ArtemisPipeClient.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ArtemisVariableBuffer.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)DllHelper.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Logger.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Utils.hpp" />
+  </ItemGroup>
+</Project>
