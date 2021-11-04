@@ -6,7 +6,7 @@ Plugin for Artemis capable of capturing RGB lighting from
 * [LightFX/AlienFX supported games](https://www.pcgamingwiki.com/wiki/RGB_lighting_middleware#Alienware_AlienFX)
 
 # Installation
-* Download the plugin and import it into Artemis. 
+* [Download](https://nightly.link/Artemis-RGB/Artemis.Plugins.Wrappers/workflows/build/master) the plugin and import it into Artemis. 
 * Let Artemis install the prerequisite.
 
 # Usage
