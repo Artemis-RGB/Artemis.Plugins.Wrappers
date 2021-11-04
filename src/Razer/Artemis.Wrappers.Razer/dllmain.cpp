@@ -113,6 +113,7 @@ extern "C" {
 		const auto buffer = RazerBuffer::create<RazerCommand::CommandUnInit>();
 		artemisPipeClient.Write(buffer.data(), buffer.size());
 		artemisPipeClient.Disconnect();
+		isInitialized = false;
 		return RZRESULT_SUCCESS;
 	}
 
