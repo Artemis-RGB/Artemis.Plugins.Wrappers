@@ -1,9 +1,12 @@
 ﻿using Artemis.Core.Services;
 using Artemis.Plugins.Wrappers.Modules.Shared;
+using RGB.NET.Core;
 using Serilog;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -14,28 +17,22 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
         private readonly ILogger _logger;
         private readonly PipeListener _pipeListener;
         private readonly object _lock;
-        private readonly Dictionary<Guid, object> _effects;
-        public readonly SKColor[] _keyboardCustom = new SKColor[KeyboardCustomEffect.Size];
-        public readonly SKColor[] _keyboardCustomExtended = new SKColor[KeyboardCustomEffectExtended.Size];
-        public readonly SKColor[] _mouseCustom = new SKColor[MouseCustomEffect.Size];
-        public readonly SKColor[] _mouseCustomExtended = new SKColor[MouseCustomEffectExtended.Size];
-        public readonly SKColor[] _mousepadCustom = new SKColor[MousepadCustomEffect.Size];
-        public readonly SKColor[] _mousepadCustomExtended = new SKColor[MousepadCustomEffectExtended.Size];
-        public readonly SKColor[] _headsetCustom = new SKColor[HeadsetCustomEffect.Size];
-        public readonly SKColor[] _keypadCustom = new SKColor[KeypadCustomEffect.Size];
-        public readonly SKColor[] _chromaLinkCustom = new SKColor[ChromaLinkCustomEffect.Size];
+        private readonly Dictionary<LedId, SKColor> _colors;
+        public ReadOnlyDictionary<LedId, SKColor> Colors { get; }
 
         public event EventHandler ColorsUpdated;
+
         public event EventHandler ClientDisconnected;
 
         public RazerWrapperListenerService(ILogger logger)
         {
             _logger = logger;
             _lock = new();
-            _effects = new();
 
-            //the custom2 payload is ~1300 bytes
-            _pipeListener = new("Artemis\\Razer", 2048);
+            _colors = new();
+            Colors = new(_colors);
+
+            _pipeListener = new("Artemis\\Razer");
             _pipeListener.ClientConnected += OnPipeListenerClientConnected;
             _pipeListener.ClientDisconnected += OnPipeListenerClientDisconnected;
             _pipeListener.CommandReceived += OnPipeListenerCommandReceived;
@@ -44,7 +41,7 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
 
         private void OnPipeListenerException(object sender, Exception e)
         {
-            _logger.Error("Razer wrapper reader exception ", e);
+            _logger.Error(e, "Razer wrapper reader exception ");
         }
 
         private void OnPipeListenerClientConnected(object sender, EventArgs e)
@@ -106,6 +103,9 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                 case EffectType.Custom:
                     var s = MemoryMarshal.Read<CustomEffect>(span[20..]);
                     break;
+                default:
+                    Debugger.Break();
+                    break;
             }
             var effectId = new Guid(span[^16..]);
         }
@@ -119,26 +119,43 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     var customKeyboardEffect = MemoryMarshal.Read<KeyboardCustomEffect>(span[4..]);
                     for (int i = 0; i < KeyboardCustomEffect.Size; i++)
                     {
-                        _keyboardCustom[i] = customKeyboardEffect[i];
+                        var ledId = LedMapping.Keyboard[i];
+                        var newColor = customKeyboardEffect[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
                 case KeyboardEffectType.Custom2:
                     var customKeyboardEffectExtended = MemoryMarshal.Read<KeyboardCustomEffectExtended>(span[4..]);
                     for (int i = 0; i < KeyboardCustomEffectExtended.Size; i++)
                     {
-                        _keyboardCustomExtended[i] = customKeyboardEffectExtended[i];
+                        var ledId = LedMapping.KeyboardExtended[i];
+                        var newColor = customKeyboardEffectExtended[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
                 case KeyboardEffectType.CustomKey:
                     var keyKeyboardEffect = MemoryMarshal.Read<KeyboardCustomKeyEffect>(span[4..]);
+                    var keys = keyKeyboardEffect.GetKeys();
                     for (int i = 0; i < KeyboardCustomKeyEffect.Size; i++)
                     {
-                        _keyboardCustom[i] = keyKeyboardEffect[i];
+                        var ledId = LedMapping.Keyboard[i];
+                        var newColor = keyKeyboardEffect[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
+                default:
+                    Debugger.Break();
+                    break;
             }
-            ColorsUpdated?.Invoke(this, EventArgs.Empty);
             var effectId = new Guid(span[^16..]);
+
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void CreateMouseEffect(ReadOnlySpan<byte> span)
@@ -150,18 +167,28 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     var customMouseEffect = MemoryMarshal.Read<MouseCustomEffect>(span[4..]);
                     for (int i = 0; i < MouseCustomEffect.Size; i++)
                     {
-                        _mouseCustom[i] = customMouseEffect[i];
+                        var ledId = LedMapping.Mouse[i];
+                        var newColor = customMouseEffect[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
                 case MouseEffectType.Custom2:
                     var customMouseEffectExtended = MemoryMarshal.Read<MouseCustomEffectExtended>(span[4..]);
                     for (int i = 0; i < MouseCustomEffectExtended.Size; i++)
                     {
-                        _mouseCustomExtended[i] = customMouseEffectExtended[i];
+                        var ledId = LedMapping.MouseExtended[i];
+                        var newColor = customMouseEffectExtended[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
             }
             var effectId = new Guid(span[^16..]);
+
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void CreateMousepadEffect(ReadOnlySpan<byte> span)
@@ -170,21 +197,31 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case MousepadEffectType.Custom:
-                    var customMouseEffect = MemoryMarshal.Read<MousepadCustomEffect>(span[4..]);
+                    var customMousepadEffect = MemoryMarshal.Read<MousepadCustomEffect>(span[4..]);
                     for (int i = 0; i < MousepadCustomEffect.Size; i++)
                     {
-                        _mousepadCustom[i] = customMouseEffect[i];
+                        var ledId = LedMapping.Mousepad[i];
+                        var newColor = customMousepadEffect[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
                 case MousepadEffectType.Custom2:
-                    var customMouseEffectExtended = MemoryMarshal.Read<MousepadCustomEffectExtended>(span[4..]);
+                    var customMousepadEffectExtended = MemoryMarshal.Read<MousepadCustomEffectExtended>(span[4..]);
                     for (int i = 0; i < MousepadCustomEffectExtended.Size; i++)
                     {
-                        _mousepadCustomExtended[i] = customMouseEffectExtended[i];
+                        var ledId = LedMapping.MousepadExtended[i];
+                        var newColor = customMousepadEffectExtended[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
             }
             var effectId = new Guid(span[^16..]);
+
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void CreateHeadsetEffect(ReadOnlySpan<byte> span)
@@ -196,11 +233,17 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     var headsetCustomEffect = MemoryMarshal.Read<HeadsetCustomEffect>(span[20..]);
                     for (int i = 0; i < HeadsetCustomEffect.Size; i++)
                     {
-                        _headsetCustom[i] = headsetCustomEffect[i];
+                        var ledId = LedMapping.Headset[i];
+                        var newColor = headsetCustomEffect[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
             }
             var effectId = new Guid(span[^16..]);
+
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void CreateKeypadEffect(ReadOnlySpan<byte> span)
@@ -212,11 +255,17 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     var customKeypadEffect = MemoryMarshal.Read<KeypadCustomEffect>(span[4..]);
                     for (int i = 0; i < KeypadCustomEffect.Size; i++)
                     {
-                        _keypadCustom[i] = customKeypadEffect[i];
+                        var ledId = LedMapping.Keypad[i];
+                        var newColor = customKeypadEffect[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
             }
             var effectId = new Guid(span[^16..]);
+
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void CreateChromaLinkEffect(ReadOnlySpan<byte> span)
@@ -228,11 +277,17 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     var customChromaLinkEffect = MemoryMarshal.Read<ChromaLinkCustomEffect>(span[4..]);
                     for (int i = 0; i < ChromaLinkCustomEffect.Size; i++)
                     {
-                        _chromaLinkCustom[i] = customChromaLinkEffect[i];
+                        var ledId = LedMapping.ChromaLink[i];
+                        var newColor = customChromaLinkEffect[i];
+
+                        if (ledId != LedId.Invalid)
+                            _colors[ledId] = newColor;
                     }
                     break;
             }
             var effectId = new Guid(span[^16..]);
+
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         public void Dispose()

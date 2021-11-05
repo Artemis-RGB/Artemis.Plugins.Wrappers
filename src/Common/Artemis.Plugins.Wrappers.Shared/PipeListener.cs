@@ -23,7 +23,7 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
         public event EventHandler<ReadOnlyMemory<byte>> CommandReceived;
         public event EventHandler<Exception> Exception;
 
-        public PipeListener(string pipeName, int bufferSize)
+        public PipeListener(string pipeName, int bufferSize = 8192)
         {
             _pipeName = pipeName;
             _bufferSize = bufferSize;

@@ -23,5 +23,17 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                 return SKColorExtensions.FromRazerUint(_colors[idx]);
             }
         }
+
+        public SKColor[] GetKeys()
+        {
+            var arr = new SKColor[SizeKeys];
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                arr[i] = SKColorExtensions.FromRazerUint(_keys[i]);
+            }
+
+            return arr;
+        }
     }
 }

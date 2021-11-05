@@ -57,7 +57,9 @@ extern "C" {
 	void EnsureValidGuid(RZEFFECTID* pEffectId)
 	{
 		if (pEffectId != nullptr && *pEffectId == GUID_NULL) {
-			CoCreateGuid(pEffectId);
+			if (CoCreateGuid(pEffectId) != S_OK) {
+				LOG("Error creating guid");
+			}
 		}
 	}
 

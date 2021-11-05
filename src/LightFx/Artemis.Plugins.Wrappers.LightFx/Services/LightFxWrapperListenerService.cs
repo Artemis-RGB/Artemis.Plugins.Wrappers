@@ -28,8 +28,7 @@ namespace Artemis.Plugins.Wrappers.LightFx.Services
             _lock = new();
             _colors = new();
 
-            //32 because most of the payloads are very small.
-            _pipeListener = new("Artemis\\LightFx", 32);
+            _pipeListener = new("Artemis\\LightFx");
             _pipeListener.ClientConnected += OnPipeListenerClientConnected;
             _pipeListener.ClientDisconnected += OnPipeListenerClientDisconnected;
             _pipeListener.CommandReceived += OnPipeListenerCommandReceived;
@@ -65,6 +64,7 @@ namespace Artemis.Plugins.Wrappers.LightFx.Services
 
                     case LightFxCommand.SetLightColor: SetLightColor(span); break;
                     case LightFxCommand.Reset: Reset(); break;
+                    case LightFxCommand.Release: Reset(); break;
                     default: _logger.Information("Unknown command id: {commandId}.", command); break;
                 }
             }

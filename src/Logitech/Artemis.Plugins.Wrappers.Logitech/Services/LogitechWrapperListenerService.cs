@@ -36,8 +36,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             _colors = new();
             _excluded = new();
 
-            //512 fits the bitmap (504 bytes), which is the largest payload
-            _pipeListener = new("Artemis\\Logitech", 512);
+            _pipeListener = new("Artemis\\Logitech");
             _pipeListener.ClientConnected += OnPipeListenerClientConnected;
             _pipeListener.ClientDisconnected += OnPipeListenerClientDisconnected;
             _pipeListener.CommandReceived += OnPipeListenerCommandReceived;

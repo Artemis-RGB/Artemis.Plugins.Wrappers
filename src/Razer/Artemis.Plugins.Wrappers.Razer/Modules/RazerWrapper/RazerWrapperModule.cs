@@ -2,6 +2,8 @@
 using Artemis.Core.Modules;
 using Artemis.Plugins.Wrappers.Razer.DataModels;
 using Artemis.Plugins.Wrappers.Razer.Services;
+using RGB.NET.Core;
+using SkiaSharp;
 using System.Collections.Generic;
 
 namespace Artemis.Plugins.Wrappers.Razer
@@ -10,6 +12,8 @@ namespace Artemis.Plugins.Wrappers.Razer
     public class RazerWrapperModule : Module<RazerWrapperDataModel>
     {
         private readonly RazerWrapperListenerService _razerWrapperListenerService;
+        private readonly Dictionary<LedId, DynamicChild<SKColor>> _colorsCache = new();
+
         public override List<IModuleActivationRequirement> ActivationRequirements => null;
 
         public RazerWrapperModule(RazerWrapperListenerService razerWrapperListenerService)
@@ -19,20 +23,7 @@ namespace Artemis.Plugins.Wrappers.Razer
 
         public override void Enable()
         {
-            DataModel.Keyboard = _razerWrapperListenerService._keyboardCustom;
-            DataModel.KeyboardExtended = _razerWrapperListenerService._keyboardCustomExtended;
-
-            DataModel.Mouse = _razerWrapperListenerService._mouseCustom;
-            DataModel.MouseExtended = _razerWrapperListenerService._mouseCustomExtended;
-
-            DataModel.Mousepad = _razerWrapperListenerService._mousepadCustom;
-            DataModel.MousepadExtended = _razerWrapperListenerService._mousepadCustomExtended;
-
-            DataModel.Headset = _razerWrapperListenerService._headsetCustom;
-
-            DataModel.Keypad = _razerWrapperListenerService._keypadCustom;
-
-            DataModel.ChromaLink = _razerWrapperListenerService._chromaLinkCustom;
+            _razerWrapperListenerService.ColorsUpdated += OnColorsUpdated;
         }
 
         public override void Disable()
@@ -49,6 +40,20 @@ namespace Artemis.Plugins.Wrappers.Razer
 
         public override void Update(double deltaTime)
         {
+        }
+
+        private void OnColorsUpdated(object sender, System.EventArgs e)
+        {
+            foreach ((var ledId, var clr) in _razerWrapperListenerService.Colors)
+            {
+                if (!_colorsCache.TryGetValue(ledId, out var colorDataModel))
+                {
+                    colorDataModel = DataModel.Leds.AddDynamicChild<SKColor>(ledId.ToString(), default);
+                    _colorsCache.Add(ledId, colorDataModel);
+                }
+
+                colorDataModel.Value = clr;
+            }
         }
     }
 }
