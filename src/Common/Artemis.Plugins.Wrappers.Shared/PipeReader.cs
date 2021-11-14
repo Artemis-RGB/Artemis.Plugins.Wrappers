@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Artemis.Plugins.Wrappers.Modules.Shared
 {
-    public class PipeReader : IDisposable
+    public sealed class PipeReader : IDisposable
     {
         private readonly NamedPipeServerStream _pipe;
         private readonly CancellationTokenSource _cancellationTokenSource;
@@ -56,12 +56,29 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
 
+        #region IDisposable
+        private bool disposedValue;
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _cancellationTokenSource.Cancel();
+                    _listenerTask.Dispose();
+                    try { _listenerTask.Wait(); } catch {/*we tried*/}
+                    _cancellationTokenSource.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
         public void Dispose()
         {
-            _cancellationTokenSource.Cancel();
-            try { _listenerTask.Wait(); } catch { }
-            _listenerTask.Dispose();
-            _cancellationTokenSource.Dispose();
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }

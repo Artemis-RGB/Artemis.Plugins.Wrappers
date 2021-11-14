@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Artemis.Plugins.Wrappers.Modules.Shared
 {
-    public class PipeListener : IDisposable
+    public sealed class PipeListener : IDisposable
     {
         private readonly string _pipeName;
         private readonly int _bufferSize;
@@ -84,21 +84,41 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
             ClientDisconnected?.Invoke(this, EventArgs.Empty);
         }
 
+        #region IDisposable
+        private bool disposedValue;
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _tokenSource.Cancel();
+                    try { _task.Wait(); } catch { }
+                    _tokenSource.Dispose();
+
+                    for (int i = _readers.Count - 1; i >= 0; i--)
+                    {
+                        _readers[i].CommandReceived -= OnReaderCommandReceived;
+                        _readers[i].Disconnected -= OnReaderDisconnected;
+                        _readers[i].Exception -= OnReaderException;
+                        _readers[i].Dispose();
+                        _readers.RemoveAt(i);
+                    }
+
+                    _readers.Clear();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
         public void Dispose()
         {
-            _tokenSource.Cancel();
-            try { _task.Wait(); } catch { }
-            _tokenSource.Dispose();
-
-            for (int i = _readers.Count - 1; i >= 0; i--)
-            {
-                _readers[i].CommandReceived -= OnReaderCommandReceived;
-                _readers[i].Disconnected -= OnReaderDisconnected;
-                _readers[i].Dispose();
-                _readers.RemoveAt(i);
-            }
-
-            _readers.Clear();
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }
