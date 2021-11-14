@@ -20,9 +20,9 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
         public PipeReader(NamedPipeServerStream pipe)
         {
             _pipe = pipe;
+            _buffer = new byte[_pipe.InBufferSize];
             _cancellationTokenSource = new();
             _listenerTask = Task.Run(ReadLoop);
-            _buffer = new byte[_pipe.InBufferSize];
         }
 
         private void ReadLoop()
