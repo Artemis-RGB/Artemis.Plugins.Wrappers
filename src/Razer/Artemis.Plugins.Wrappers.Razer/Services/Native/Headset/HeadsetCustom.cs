@@ -2,10 +2,10 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Artemis.Plugins.Wrappers.Razer.Services
+namespace Artemis.Plugins.Wrappers.Razer.Services.Native
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal unsafe struct ChromaLinkCustomEffect
+    internal unsafe struct HeadsetCustom
     {
         public const int Size = 5;
 

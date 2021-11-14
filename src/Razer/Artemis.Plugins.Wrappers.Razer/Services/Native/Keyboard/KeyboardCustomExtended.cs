@@ -2,14 +2,16 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Artemis.Plugins.Wrappers.Razer.Services
+namespace Artemis.Plugins.Wrappers.Razer.Services.Native
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal unsafe struct KeyboardCustomEffect
+    internal unsafe struct KeyboardCustomExtended
     {
-        public const int Size = 6 * 22;
+        public const int Size = 8 * 24;
+        public const int SizeKeys = 6 * 22;
 
         private fixed uint _colors[Size];
+        private fixed uint _keys[SizeKeys];//what even is this?? investigate.
 
         public SKColor this[int idx]
         {

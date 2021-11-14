@@ -1,5 +1,6 @@
 ﻿using Artemis.Core.Services;
 using Artemis.Plugins.Wrappers.Modules.Shared;
+using Artemis.Plugins.Wrappers.Razer.Services.Native;
 using RGB.NET.Core;
 using Serilog;
 using SkiaSharp;
@@ -101,7 +102,7 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case EffectType.Custom:
-                    var s = MemoryMarshal.Read<CustomEffect>(span[20..]);
+                    var s = MemoryMarshal.Read<GenericCustom>(span[20..]);
                     break;
                 default:
                     Debugger.Break();
@@ -116,8 +117,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case KeyboardEffectType.Custom:
-                    var customKeyboardEffect = MemoryMarshal.Read<KeyboardCustomEffect>(span[4..]);
-                    for (int i = 0; i < KeyboardCustomEffect.Size; i++)
+                    var customKeyboardEffect = MemoryMarshal.Read<KeyboardCustom>(span[4..]);
+                    for (int i = 0; i < KeyboardCustom.Size; i++)
                     {
                         var ledId = LedMapping.Keyboard[i];
                         var newColor = customKeyboardEffect[i];
@@ -127,8 +128,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     }
                     break;
                 case KeyboardEffectType.Custom2:
-                    var customKeyboardEffectExtended = MemoryMarshal.Read<KeyboardCustomEffectExtended>(span[4..]);
-                    for (int i = 0; i < KeyboardCustomEffectExtended.Size; i++)
+                    var customKeyboardEffectExtended = MemoryMarshal.Read<KeyboardCustomExtended>(span[4..]);
+                    for (int i = 0; i < KeyboardCustomExtended.Size; i++)
                     {
                         var ledId = LedMapping.KeyboardExtended[i];
                         var newColor = customKeyboardEffectExtended[i];
@@ -138,9 +139,9 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     }
                     break;
                 case KeyboardEffectType.CustomKey:
-                    var keyKeyboardEffect = MemoryMarshal.Read<KeyboardCustomKeyEffect>(span[4..]);
+                    var keyKeyboardEffect = MemoryMarshal.Read<KeyboardCustomKey>(span[4..]);
                     var keys = keyKeyboardEffect.GetKeys();
-                    for (int i = 0; i < KeyboardCustomKeyEffect.Size; i++)
+                    for (int i = 0; i < KeyboardCustomKey.Size; i++)
                     {
                         var ledId = LedMapping.Keyboard[i];
                         var newColor = keyKeyboardEffect[i];
@@ -164,8 +165,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case MouseEffectType.Custom:
-                    var customMouseEffect = MemoryMarshal.Read<MouseCustomEffect>(span[4..]);
-                    for (int i = 0; i < MouseCustomEffect.Size; i++)
+                    var customMouseEffect = MemoryMarshal.Read<MouseCustom>(span[4..]);
+                    for (int i = 0; i < MouseCustom.Size; i++)
                     {
                         var ledId = LedMapping.Mouse[i];
                         var newColor = customMouseEffect[i];
@@ -175,8 +176,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     }
                     break;
                 case MouseEffectType.Custom2:
-                    var customMouseEffectExtended = MemoryMarshal.Read<MouseCustomEffectExtended>(span[4..]);
-                    for (int i = 0; i < MouseCustomEffectExtended.Size; i++)
+                    var customMouseEffectExtended = MemoryMarshal.Read<MouseCustomExtended>(span[4..]);
+                    for (int i = 0; i < MouseCustomExtended.Size; i++)
                     {
                         var ledId = LedMapping.MouseExtended[i];
                         var newColor = customMouseEffectExtended[i];
@@ -197,8 +198,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case MousepadEffectType.Custom:
-                    var customMousepadEffect = MemoryMarshal.Read<MousepadCustomEffect>(span[4..]);
-                    for (int i = 0; i < MousepadCustomEffect.Size; i++)
+                    var customMousepadEffect = MemoryMarshal.Read<MousepadCustom>(span[4..]);
+                    for (int i = 0; i < MousepadCustom.Size; i++)
                     {
                         var ledId = LedMapping.Mousepad[i];
                         var newColor = customMousepadEffect[i];
@@ -208,8 +209,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     }
                     break;
                 case MousepadEffectType.Custom2:
-                    var customMousepadEffectExtended = MemoryMarshal.Read<MousepadCustomEffectExtended>(span[4..]);
-                    for (int i = 0; i < MousepadCustomEffectExtended.Size; i++)
+                    var customMousepadEffectExtended = MemoryMarshal.Read<MousepadCustomExtended>(span[4..]);
+                    for (int i = 0; i < MousepadCustomExtended.Size; i++)
                     {
                         var ledId = LedMapping.MousepadExtended[i];
                         var newColor = customMousepadEffectExtended[i];
@@ -230,8 +231,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case HeadsetEffectType.Custom:
-                    var headsetCustomEffect = MemoryMarshal.Read<HeadsetCustomEffect>(span[20..]);
-                    for (int i = 0; i < HeadsetCustomEffect.Size; i++)
+                    var headsetCustomEffect = MemoryMarshal.Read<HeadsetCustom>(span[20..]);
+                    for (int i = 0; i < HeadsetCustom.Size; i++)
                     {
                         var ledId = LedMapping.Headset[i];
                         var newColor = headsetCustomEffect[i];
@@ -252,8 +253,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case KeypadEffectType.Custom:
-                    var customKeypadEffect = MemoryMarshal.Read<KeypadCustomEffect>(span[4..]);
-                    for (int i = 0; i < KeypadCustomEffect.Size; i++)
+                    var customKeypadEffect = MemoryMarshal.Read<KeypadCustom>(span[4..]);
+                    for (int i = 0; i < KeypadCustom.Size; i++)
                     {
                         var ledId = LedMapping.Keypad[i];
                         var newColor = customKeypadEffect[i];
@@ -274,8 +275,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             switch (effectType)
             {
                 case ChromaLinkEffectType.Custom:
-                    var customChromaLinkEffect = MemoryMarshal.Read<ChromaLinkCustomEffect>(span[4..]);
-                    for (int i = 0; i < ChromaLinkCustomEffect.Size; i++)
+                    var customChromaLinkEffect = MemoryMarshal.Read<ChromaLinkCustom>(span[4..]);
+                    for (int i = 0; i < ChromaLinkCustom.Size; i++)
                     {
                         var ledId = LedMapping.ChromaLink[i];
                         var newColor = customChromaLinkEffect[i];

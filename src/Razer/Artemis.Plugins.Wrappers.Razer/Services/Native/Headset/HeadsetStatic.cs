@@ -2,12 +2,12 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Artemis.Plugins.Wrappers.Razer.Services
+namespace Artemis.Plugins.Wrappers.Razer.Services.Native
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal unsafe struct HeadsetCustomEffect
+    internal unsafe struct HeadsetStatic
     {
-        public const int Size = 5;
+        public const int Size = 30;
 
         private fixed uint _colors[Size];
 

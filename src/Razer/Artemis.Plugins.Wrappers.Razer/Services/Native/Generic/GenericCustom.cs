@@ -2,13 +2,14 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Artemis.Plugins.Wrappers.Razer.Services
+namespace Artemis.Plugins.Wrappers.Razer.Services.Native
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal unsafe struct KeypadCustomEffect
+    internal unsafe struct GenericCustom
     {
-        public const int Size = 4 * 5;
-
+        public const int Size = 30 * 30;
+        public readonly ulong Count;
+        public readonly uint Param;
         private fixed uint _colors[Size];
 
         public SKColor this[int idx]
@@ -18,7 +19,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                 if (idx >= Size)
                     throw new ArgumentOutOfRangeException();
 
-                return SKColorExtensions.FromRazerUint(_colors[idx]);
+                var clr = _colors[idx];
+                return SKColorExtensions.FromRazerUint(clr);
             }
         }
     }

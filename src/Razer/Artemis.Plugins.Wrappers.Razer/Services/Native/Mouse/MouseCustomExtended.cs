@@ -2,12 +2,12 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Artemis.Plugins.Wrappers.Razer.Services
+namespace Artemis.Plugins.Wrappers.Razer.Services.Native
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal unsafe struct MousepadCustomEffect
+    internal unsafe struct MouseCustomExtended
     {
-        public const int Size = 15;
+        public const int Size = 9 * 7;
 
         private fixed uint _colors[Size];
 

@@ -1,4 +1,4 @@
-﻿namespace Artemis.Plugins.Wrappers.Razer.Services
+﻿namespace Artemis.Plugins.Wrappers.Razer.Services.Native
 {
     public enum KeypadEffectType
     {
