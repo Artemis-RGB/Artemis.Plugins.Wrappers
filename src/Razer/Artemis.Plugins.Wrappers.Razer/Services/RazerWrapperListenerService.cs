@@ -12,7 +12,7 @@ using System.Text;
 
 namespace Artemis.Plugins.Wrappers.Razer.Services
 {
-    public class RazerWrapperListenerService : IPluginService, IDisposable
+    public sealed class RazerWrapperListenerService : IPluginService, IDisposable
     {
         private readonly ILogger _logger;
         private readonly PipeListener _pipeListener;
@@ -290,13 +290,30 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
+        #region IDisposable
+        private bool disposedValue;
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _pipeListener.ClientConnected -= OnPipeListenerClientConnected;
+                    _pipeListener.ClientDisconnected -= OnPipeListenerClientDisconnected;
+                    _pipeListener.CommandReceived -= OnPipeListenerCommandReceived;
+                    _pipeListener.Exception -= OnPipeListenerException;
+                    _pipeListener?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
         public void Dispose()
         {
-            _pipeListener.ClientConnected -= OnPipeListenerClientConnected;
-            _pipeListener.ClientDisconnected -= OnPipeListenerClientDisconnected;
-            _pipeListener.CommandReceived -= OnPipeListenerCommandReceived;
-            _pipeListener.Exception -= OnPipeListenerException;
-            _pipeListener?.Dispose();
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }
