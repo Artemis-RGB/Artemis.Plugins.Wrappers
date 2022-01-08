@@ -1,5 +1,6 @@
 ﻿using Artemis.Core.Services;
 using Artemis.Plugins.Wrappers.Modules.Shared;
+using Artemis.Plugins.Wrappers.Razer.Services.Effects;
 using Artemis.Plugins.Wrappers.Razer.Services.Native;
 using RGB.NET.Core;
 using Serilog;
@@ -7,8 +8,6 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Artemis.Plugins.Wrappers.Razer.Services
@@ -18,7 +17,9 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
         private readonly ILogger _logger;
         private readonly PipeListener _pipeListener;
         private readonly object _lock;
+        private readonly Dictionary<Guid, IRazerChromaEffect> _effects;
         private readonly Dictionary<LedId, SKColor> _colors;
+
         public ReadOnlyDictionary<LedId, SKColor> Colors { get; }
 
         public event EventHandler ColorsUpdated;
@@ -29,7 +30,7 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
         {
             _logger = logger;
             _lock = new();
-
+            _effects = new();
             _colors = new();
             Colors = new(_colors);
 
@@ -62,6 +63,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
             {
                 var command = (RazerCommand)BitConverter.ToUInt32(e.Span.Slice(0, 4));
                 var span = e.Span[4..];
+                _logger.Verbose("Razer command id: {commandId}.", command);
+
                 switch (command)
                 {
                     case RazerCommand.Init: Init(span); break;
@@ -74,9 +77,8 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
                     case RazerCommand.CreateHeadsetEffect: CreateHeadsetEffect(span); break;
                     case RazerCommand.CreateKeypadEffect: CreateKeypadEffect(span); break;
                     case RazerCommand.CreateChromaLinkEffect: CreateChromaLinkEffect(span); break;
-                    default: _logger.Verbose("Unknown command id: {commandId}.", command); break;
+                    default: _logger.Information("Unknown command id: {commandId}.", command); break;
                 }
-                //_logger.Information("Razer command id: {commandId}.", command);
             }
         }
 
@@ -88,207 +90,142 @@ namespace Artemis.Plugins.Wrappers.Razer.Services
         private void SetEffect(ReadOnlySpan<byte> span)
         {
             var effectId = new Guid(span.Slice(0, 16));
+            if (_effects.TryGetValue(effectId, out var effect))
+            {
+                effect.Apply(_colors);
+            }
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void DeleteEffect(ReadOnlySpan<byte> span)
         {
             var effectId = new Guid(span.Slice(0, 16));
+            _effects.Remove(effectId);
+            //un-render somehow.
         }
 
         private void CreateEffect(ReadOnlySpan<byte> span)
         {
-            var deviceId = new Guid(span.Slice(0, 16));
+            var deviceId = new Guid(span[..16]);
             var effectType = (EffectType)BitConverter.ToInt32(span.Slice(16, 4));
-            switch (effectType)
-            {
-                case EffectType.Custom:
-                    var s = MemoryMarshal.Read<GenericCustom>(span[20..]);
-                    break;
-                default:
-                    Debugger.Break();
-                    break;
-            }
             var effectId = new Guid(span[^16..]);
+            _logger.Verbose("Razer effect type: {effectType}.", effectType);
+            //todo
         }
 
         private void CreateKeyboardEffect(ReadOnlySpan<byte> span)
         {
             var effectType = (KeyboardEffectType)BitConverter.ToInt32(span.Slice(0, 4));
-            switch (effectType)
-            {
-                case KeyboardEffectType.Custom:
-                    var customKeyboardEffect = MemoryMarshal.Read<KeyboardCustom>(span[4..]);
-                    for (int i = 0; i < KeyboardCustom.Size; i++)
-                    {
-                        var ledId = LedMapping.Keyboard[i];
-                        var newColor = customKeyboardEffect[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-                case KeyboardEffectType.Custom2:
-                    var customKeyboardEffectExtended = MemoryMarshal.Read<KeyboardCustomExtended>(span[4..]);
-                    for (int i = 0; i < KeyboardCustomExtended.Size; i++)
-                    {
-                        var ledId = LedMapping.KeyboardExtended[i];
-                        var newColor = customKeyboardEffectExtended[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-                case KeyboardEffectType.CustomKey:
-                    var keyKeyboardEffect = MemoryMarshal.Read<KeyboardCustomKey>(span[4..]);
-                    var keys = keyKeyboardEffect.GetKeys();
-                    for (int i = 0; i < KeyboardCustomKey.Size; i++)
-                    {
-                        var ledId = LedMapping.Keyboard[i];
-                        var newColor = keyKeyboardEffect[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-                default:
-                    Debugger.Break();
-                    break;
-            }
+            var effectData = span[4..^16];
             var effectId = new Guid(span[^16..]);
 
-            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            _logger.Verbose("Razer effect type: {effectType}.", effectType);
+            IRazerChromaEffect effect = effectType switch
+            {
+                KeyboardEffectType.Custom => new KeyboardCustomEffect(effectData),
+                KeyboardEffectType.Custom2 => new KeyboardCustomExtendedEffect(effectData),
+                KeyboardEffectType.CustomKey => new KeyboardCustomKeyEffect(effectData),
+                _ => null
+            };
+
+            if (effect != null)
+            {
+                _effects[effectId] = effect;
+            }
         }
 
         private void CreateMouseEffect(ReadOnlySpan<byte> span)
         {
             var effectType = (MouseEffectType)BitConverter.ToInt32(span.Slice(0, 4));
-            switch (effectType)
-            {
-                case MouseEffectType.Custom:
-                    var customMouseEffect = MemoryMarshal.Read<MouseCustom>(span[4..]);
-                    for (int i = 0; i < MouseCustom.Size; i++)
-                    {
-                        var ledId = LedMapping.Mouse[i];
-                        var newColor = customMouseEffect[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-                case MouseEffectType.Custom2:
-                    var customMouseEffectExtended = MemoryMarshal.Read<MouseCustomExtended>(span[4..]);
-                    for (int i = 0; i < MouseCustomExtended.Size; i++)
-                    {
-                        var ledId = LedMapping.MouseExtended[i];
-                        var newColor = customMouseEffectExtended[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-            }
+            var effectData = span[4..^16];
             var effectId = new Guid(span[^16..]);
 
-            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            _logger.Verbose("Razer effect type: {effectType}.", effectType);
+            IRazerChromaEffect effect = effectType switch
+            {
+                MouseEffectType.Custom => new MouseCustomEffect(effectData),
+                MouseEffectType.Custom2 => new MouseCustomExtendedEffect(effectData),
+                MouseEffectType.Static => new MouseStaticEffect(effectData),
+                _ => null
+            };
+
+            if (effect != null)
+            {
+                _effects[effectId] = effect;
+            }
         }
 
         private void CreateMousepadEffect(ReadOnlySpan<byte> span)
         {
             var effectType = (MousepadEffectType)BitConverter.ToInt32(span.Slice(0, 4));
-            switch (effectType)
-            {
-                case MousepadEffectType.Custom:
-                    var customMousepadEffect = MemoryMarshal.Read<MousepadCustom>(span[4..]);
-                    for (int i = 0; i < MousepadCustom.Size; i++)
-                    {
-                        var ledId = LedMapping.Mousepad[i];
-                        var newColor = customMousepadEffect[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-                case MousepadEffectType.Custom2:
-                    var customMousepadEffectExtended = MemoryMarshal.Read<MousepadCustomExtended>(span[4..]);
-                    for (int i = 0; i < MousepadCustomExtended.Size; i++)
-                    {
-                        var ledId = LedMapping.MousepadExtended[i];
-                        var newColor = customMousepadEffectExtended[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-            }
+            var effectData = span[4..^16];
             var effectId = new Guid(span[^16..]);
+            _logger.Verbose("Razer effect type: {effectType}.", effectType);
+            IRazerChromaEffect effect = effectType switch
+            {
+                MousepadEffectType.Custom => new MousepadCustomEffect(effectData),
+                MousepadEffectType.Custom2 => new MousepadCustomExtendedEffect(effectData),
+                _ => null
+            };
 
-            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            if (effect != null)
+            {
+                _effects[effectId] = effect;
+            }
         }
 
         private void CreateHeadsetEffect(ReadOnlySpan<byte> span)
         {
-            var effectType = (HeadsetEffectType)BitConverter.ToInt32(span.Slice(0, 4));
-            switch (effectType)
-            {
-                case HeadsetEffectType.Custom:
-                    var headsetCustomEffect = MemoryMarshal.Read<HeadsetCustom>(span[20..]);
-                    for (int i = 0; i < HeadsetCustom.Size; i++)
-                    {
-                        var ledId = LedMapping.Headset[i];
-                        var newColor = headsetCustomEffect[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-            }
+            var effectType = (HeadsetEffectType)BitConverter.ToInt32(span[..4]);
+            var effectData = span[4..^16];
             var effectId = new Guid(span[^16..]);
+            _logger.Verbose("Razer effect type: {effectType}.", effectType);
+            IRazerChromaEffect effect = effectType switch
+            {
+                HeadsetEffectType.Custom => new HeadsetCustomEffect(effectData),
+                _ => null
+            };
 
-            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            if (effect != null)
+            {
+                _effects[effectId] = effect;
+            }
         }
 
         private void CreateKeypadEffect(ReadOnlySpan<byte> span)
         {
-            var effectType = (KeypadEffectType)BitConverter.ToInt32(span.Slice(0, 4));
-            switch (effectType)
-            {
-                case KeypadEffectType.Custom:
-                    var customKeypadEffect = MemoryMarshal.Read<KeypadCustom>(span[4..]);
-                    for (int i = 0; i < KeypadCustom.Size; i++)
-                    {
-                        var ledId = LedMapping.Keypad[i];
-                        var newColor = customKeypadEffect[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-            }
+            var effectType = (KeypadEffectType)BitConverter.ToInt32(span[..4]);
+            var effectData = span[4..^16];
             var effectId = new Guid(span[^16..]);
+            _logger.Verbose("Razer effect type: {effectType}.", effectType);
+            IRazerChromaEffect effect = effectType switch
+            {
+                KeypadEffectType.Custom => new KeypadCustomEffect(effectData),
+                _ => null
+            };
 
-            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            if (effect != null)
+            {
+                _effects[effectId] = effect;
+            }
         }
 
         private void CreateChromaLinkEffect(ReadOnlySpan<byte> span)
         {
-            var effectType = (ChromaLinkEffectType)BitConverter.ToInt32(span.Slice(0, 4));
-            switch (effectType)
-            {
-                case ChromaLinkEffectType.Custom:
-                    var customChromaLinkEffect = MemoryMarshal.Read<ChromaLinkCustom>(span[4..]);
-                    for (int i = 0; i < ChromaLinkCustom.Size; i++)
-                    {
-                        var ledId = LedMapping.ChromaLink[i];
-                        var newColor = customChromaLinkEffect[i];
-
-                        if (ledId != LedId.Invalid)
-                            _colors[ledId] = newColor;
-                    }
-                    break;
-            }
+            var effectType = (ChromaLinkEffectType)BitConverter.ToInt32(span[..4]);
+            var effectData = span[4..^16];
             var effectId = new Guid(span[^16..]);
+            _logger.Verbose("Razer effect type: {effectType}.", effectType);
+            IRazerChromaEffect effect = effectType switch
+            {
+                ChromaLinkEffectType.Custom => new ChromaLinkCustomEffect(effectData),
+                _ => null
+            };
 
-            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            if (effect != null)
+            {
+                _effects[effectId] = effect;
+            }
         }
 
         #region IDisposable

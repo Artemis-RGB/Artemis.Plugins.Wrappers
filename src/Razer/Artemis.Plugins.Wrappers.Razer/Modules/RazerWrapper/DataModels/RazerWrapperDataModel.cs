@@ -1,5 +1,4 @@
 ﻿using Artemis.Core.Modules;
-using SkiaSharp;
 
 namespace Artemis.Plugins.Wrappers.Razer.DataModels
 {
