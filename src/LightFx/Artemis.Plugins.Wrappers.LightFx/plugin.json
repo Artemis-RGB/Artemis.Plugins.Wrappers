@@ -1,7 +1,9 @@
 {
   "Guid": "4a33f20f-5ecd-44fb-ab92-fdbe650e7d29",
   "Name": "LightFX Wrapper",
-  "Description": "This is my awesome plugin",
+  "Author": "diogotr7",
+  "Description": "Allows you to use LightFX integration on all Artemis supported devices",
   "Version": "1.0.0.0",
-  "Main": "Artemis.Plugins.Wrappers.LightFx.dll"
+  "Main": "Artemis.Plugins.Wrappers.LightFx.dll",
+  "Platforms": "Windows"
 }

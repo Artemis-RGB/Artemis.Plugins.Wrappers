@@ -1,10 +1,9 @@
 {
   "Guid": "02ed2899-45b6-4eee-ac99-11eff5c493c3",
   "Name": "Razer Wrapper",
-  "Description": "This is my awesome plugin",
   "Author": "diogotr7",
-  "Website": null,
-  "Repository": null,
+  "Description": "Allows you to use Razer Chroma integration on all Artemis supported devices",
   "Version": "1.0.0.0",
-  "Main": "Artemis.Plugins.Wrappers.Razer.dll"
+  "Main": "Artemis.Plugins.Wrappers.Razer.dll",
+  "Platforms": "Windows"
 }
