@@ -12,7 +12,7 @@ void OriginalDllWrapper::LoadDll() {
 	HKEY registryKey;
 	LSTATUS result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, REGISTRY_PATH, 0, KEY_QUERY_VALUE, &registryKey);
 	if (result != ERROR_SUCCESS) {
-		LOG(std::format("Failed to open registry key \'{}\'. Error: {}}", utf8_encode(REGISTRY_PATH), result));
+		LOG(std::format("Failed to open registry key \'{}\'. Error: {}", utf8_encode(REGISTRY_PATH), result));
 		return;
 	}
 

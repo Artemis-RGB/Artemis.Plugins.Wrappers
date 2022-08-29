@@ -66,7 +66,7 @@ public:
 			NULL);
 
 		if ((!result) || (writtenLength < length)) {
-			LOG(std::format("Error writing to pipe: \'{error}\'. Wrote {bytes} bytes out of {total}", result, writtenLength, length));
+			LOG(std::format("Error writing to pipe: \'{}\'. Wrote {} bytes out of {}", result, writtenLength, length));
 			Disconnect();
 		}
 	}
