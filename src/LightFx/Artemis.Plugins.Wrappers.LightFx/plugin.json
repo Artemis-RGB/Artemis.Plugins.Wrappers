@@ -1,5 +1,6 @@
 {
   "Guid": "4a33f20f-5ecd-44fb-ab92-fdbe650e7d29",
+  "Api": "1.0",
   "Name": "LightFX Wrapper",
   "Author": "diogotr7",
   "Description": "Allows you to use LightFX integration on all Artemis supported devices",

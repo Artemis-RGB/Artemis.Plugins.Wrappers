@@ -1,5 +1,6 @@
 {
   "Guid": "02ed2899-45b6-4eee-ac99-11eff5c493c3",
+  "Api": "1.0",
   "Name": "Razer Wrapper",
   "Author": "diogotr7",
   "Description": "Allows you to use Razer Chroma integration on all Artemis supported devices",
