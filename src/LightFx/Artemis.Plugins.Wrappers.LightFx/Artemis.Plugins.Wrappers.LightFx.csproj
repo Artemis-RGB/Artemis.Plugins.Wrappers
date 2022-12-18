@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Platforms>x64</Platforms>
-    <EnableDynamicLoading>true</EnableDynamicLoading>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <Platforms>x64</Platforms>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Common\Artemis.Plugins.Wrappers.Shared\Artemis.Plugins.Wrappers.Shared.csproj" />
-  </ItemGroup>
-    
-  <ItemGroup>
-    <PackageReference Include="ArtemisRGB.UI.Shared" IncludeAssets="compile;build;buildTransitive" Version="1.2022.1112.5" />
-  </ItemGroup>
-    
-  <ItemGroup>
-    <Content Include="x64\Artemis.Wrappers.LightFx.dll" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="x86\Artemis.Wrappers.LightFx.dll" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Common\Artemis.Plugins.Wrappers.Shared\Artemis.Plugins.Wrappers.Shared.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
-    <PackageReference Include="ArtemisRGB.Plugins.BuildTask" Version="1.1.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ArtemisRGB.UI.Shared" IncludeAssets="compile;build;buildTransitive" Version="1.2022.1114.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="x64\Artemis.Wrappers.LightFx.dll" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="x86\Artemis.Wrappers.LightFx.dll" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="plugin.json" CopyToOutputDirectory="PreserveNewest" />
+        <PackageReference Include="ArtemisRGB.Plugins.BuildTask" Version="1.1.0" />
+    </ItemGroup>
 </Project>

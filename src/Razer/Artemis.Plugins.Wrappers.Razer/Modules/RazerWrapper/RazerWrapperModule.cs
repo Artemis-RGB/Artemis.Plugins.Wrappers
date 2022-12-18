@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Artemis.Plugins.Wrappers.Razer
 {
-    [PluginFeature(Name = "Razer Wrapper", Icon = "Snake")]
+    [PluginFeature(Name = "Razer Wrapper")]
     public class RazerWrapperModule : Module<RazerWrapperDataModel>
     {
         private readonly RazerWrapperListenerService _razerWrapperListenerService;
