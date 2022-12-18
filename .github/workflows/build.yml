@@ -15,56 +15,41 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
 
-      - name: Clone Artemis
-        uses: actions/checkout@v2
-        with:
-          repository: Artemis-RGB/Artemis
-          path: Artemis
-          ref: feature/avalonia
-
-      - name: Build Artemis Core
-        run: dotnet build .\Artemis\src\Artemis.Core\Artemis.Core.csproj
-        
-      - name: Build Artemis UI Shared
-        run: dotnet build .\Artemis\src\Artemis.UI.Shared\Artemis.UI.Shared.csproj
-
       - name: Clone Plugins
         uses: actions/checkout@v2
-        with:
-          path: Plugins
 
       - name: Build LightFx Wrapper dll
-        run: MSBuild.exe .\Plugins\src\LightFx\Artemis.Wrappers.LightFx\Artemis.Wrappers.LightFx.vcxproj /p:Platform=x64 /p:Configuration=Release
+        run: MSBuild.exe src/LightFx/Artemis.Wrappers.LightFx/Artemis.Wrappers.LightFx.vcxproj /p:Platform=x64 /p:Configuration=Release
 
       - name: Build Logitech Wrapper dll
-        run: MSBuild.exe .\Plugins\src\Logitech\Artemis.Wrappers.Logitech\Artemis.Wrappers.Logitech.vcxproj /p:Platform=x64 /p:Configuration=Release
+        run: MSBuild.exe src/Logitech/Artemis.Wrappers.Logitech/Artemis.Wrappers.Logitech.vcxproj /p:Platform=x64 /p:Configuration=Release
 
       - name: Build Razer Wrapper dll
-        run: MSBuild.exe .\Plugins\src\Razer\Artemis.Wrappers.Razer\Artemis.Wrappers.Razer.vcxproj /p:Platform=x64 /p:Configuration=Release
+        run: MSBuild.exe src/Razer/Artemis.Wrappers.Razer/Artemis.Wrappers.Razer.vcxproj /p:Platform=x64 /p:Configuration=Release
         
       - name: Build LightFx Plugin
-        run: dotnet publish -c Release .\Plugins\src\LightFx\Artemis.Plugins.Wrappers.LightFx\Artemis.Plugins.Wrappers.LightFx.csproj
+        run: dotnet publish -c Release src/LightFx/Artemis.Plugins.Wrappers.LightFx/Artemis.Plugins.Wrappers.LightFx.csproj
 
       - name: Build Logitech Plugin
-        run: dotnet publish -c Release .\Plugins\src\Logitech\Artemis.Plugins.Wrappers.Logitech\Artemis.Plugins.Wrappers.Logitech.csproj
+        run: dotnet publish -c Release src/Logitech/Artemis.Plugins.Wrappers.Logitech/Artemis.Plugins.Wrappers.Logitech.csproj
 
       - name: Build Razer Plugin
-        run: dotnet publish -c Release .\Plugins\src\Razer\Artemis.Plugins.Wrappers.Razer\Artemis.Plugins.Wrappers.Razer.csproj
+        run: dotnet publish -c Release src/Razer/Artemis.Plugins.Wrappers.Razer/Artemis.Plugins.Wrappers.Razer.csproj
 
       - name: Upload LightFx Wrapper
         uses: actions/upload-artifact@v2
         with:
           name: Artemis.Plugins.Wrappers.LightFx
-          path: .\Plugins\src\LightFx\Artemis.Plugins.Wrappers.LightFx\bin\Release\net6.0-windows\publish
+          path: src/LightFx/Artemis.Plugins.Wrappers.LightFx/bin/Release/net6.0-windows/publish
 
       - name: Upload Logitech Wrapper
         uses: actions/upload-artifact@v2
         with:
           name: Artemis.Plugins.Wrappers.Logitech
-          path: .\Plugins\src\Logitech\Artemis.Plugins.Wrappers.Logitech\bin\Release\net6.0-windows\publish
+          path: src/Logitech/Artemis.Plugins.Wrappers.Logitech/bin/Release/net6.0-windows/publish
 
       - name: Upload Razer Wrapper
         uses: actions/upload-artifact@v2
         with:
           name: Artemis.Plugins.Wrappers.Razer
-          path: .\Plugins\src\Razer\Artemis.Plugins.Wrappers.Razer\bin\Release\net6.0-windows\publish
+          path: src/Razer/Artemis.Plugins.Wrappers.Razer/bin/Release/net6.0-windows/publish
