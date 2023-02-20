@@ -56,6 +56,6 @@ namespace Artemis.Plugins.Wrappers.LightFx
         private const string DLL_NAME = "Artemis.Wrappers.LightFx.dll";
         private const string DLL_NAME_SYSTEM = "LightFX.dll";
         private const string ARTEMIS_COMPANY_NAME = "Artemis";
-        private const string ARTEMIS_DLL_VERSION = "1.3.0.0";
+        private const string ARTEMIS_DLL_VERSION = "1.4.0.0";
     }
 }
