@@ -7,7 +7,5 @@ namespace Artemis.Plugins.Wrappers.Logitech.Modules.DataModels
     {
         public SKColor BackgroundColor { get; set; }
         public LogitechKeysDataModel Keys { get; set; } = new();
-        public int Flag { get; internal set; }
-        public string FlagHex { get; internal set; }
     }
 }

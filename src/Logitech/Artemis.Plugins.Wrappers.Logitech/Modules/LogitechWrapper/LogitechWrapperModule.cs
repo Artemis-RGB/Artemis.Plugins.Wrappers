@@ -1,4 +1,4 @@
-﻿using Artemis.Core;
+using Artemis.Core;
 using Artemis.Core.Modules;
 using Artemis.Plugins.Wrappers.Logitech.Modules.DataModels;
 using Artemis.Plugins.Wrappers.Logitech.Services;
@@ -40,8 +40,6 @@ namespace Artemis.Plugins.Wrappers.Logitech.Modules
         private void WrapperServiceOnColorsUpdated(object sender, EventArgs e)
         {
             DataModel.BackgroundColor = _wrapperService.BackgroundColor;
-            DataModel.Flag = _wrapperService.UnknownParameter;
-            DataModel.FlagHex = _wrapperService.UnknownParameter.ToString("x8");
 
             foreach (KeyValuePair<LedId, SKColor> kvp in _wrapperService.Colors)
             {
