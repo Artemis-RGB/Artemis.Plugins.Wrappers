@@ -5,6 +5,7 @@ using Serilog;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Artemis.Plugins.Wrappers.LightFx.Services
 {
@@ -43,12 +44,13 @@ namespace Artemis.Plugins.Wrappers.LightFx.Services
         private void OnPipeListenerClientDisconnected(object sender, EventArgs e)
         {
             _logger.Information("LightFx wrapper reader disconnected.");
+            Reset();
             ClientDisconnected?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnPipeListenerException(object sender, Exception e)
         {
-            _logger.Error("LightFx wrapper reader exception ", e);
+            _logger.Error(e, "LightFx wrapper reader exception ");
         }
 
         private void OnPipeListenerCommandReceived(object sender, ReadOnlyMemory<byte> e)
@@ -61,10 +63,9 @@ namespace Artemis.Plugins.Wrappers.LightFx.Services
                 switch (command)
                 {
                     case LightFxCommand.Update: Updated?.Invoke(this, EventArgs.Empty); break;
-
+                    case LightFxCommand.Initialize: Console.WriteLine($"Initialize: {Encoding.ASCII.GetString(span)}"); break;
                     case LightFxCommand.SetLightColor: SetLightColor(span); break;
                     case LightFxCommand.Reset: Reset(); break;
-                    case LightFxCommand.Release: Reset(); break;
                     default: _logger.Information("Unknown command id: {commandId}.", command); break;
                 }
             }

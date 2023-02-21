@@ -4,7 +4,6 @@
     {
         Init = 1,
         InitSDK,
-        UnInit,
         CreateEffect,
         CreateKeyboardEffect,
         CreateMouseEffect,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Linq;
@@ -46,7 +46,7 @@ namespace Artemis.Plugins.Wrappers.Modules.Shared
                         _pipeName,
                         PipeDirection.InOut,
                         NamedPipeServerStream.MaxAllowedServerInstances,
-                        PipeTransmissionMode.Message,
+                        PipeTransmissionMode.Byte,
                         PipeOptions.Asynchronous,
                         _bufferSize,
                         0,

@@ -7,7 +7,7 @@ namespace Artemis.Plugins.Wrappers.Logitech
     {
         public override void OnPluginLoaded(Plugin plugin)
         {
-            AddPluginPrerequisite(new LogitechWrapperPrerequisite(plugin));
+            //AddPluginPrerequisite(new LogitechWrapperPrerequisite(plugin));
         }
     }
 }

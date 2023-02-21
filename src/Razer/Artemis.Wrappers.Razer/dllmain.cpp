@@ -112,8 +112,6 @@ extern "C" {
 		if (!artemisPipeClient.IsConnected())
 			return RZRESULT_SERVICE_NOT_ACTIVE;
 
-		const auto buffer = RazerBuffer::create<RazerCommand::CommandUnInit>();
-		artemisPipeClient.Write(buffer.data(), buffer.size());
 		artemisPipeClient.Disconnect();
 		isInitialized = false;
 		return RZRESULT_SUCCESS;

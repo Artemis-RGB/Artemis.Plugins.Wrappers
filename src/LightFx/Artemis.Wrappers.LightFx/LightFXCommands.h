@@ -1,7 +1,6 @@
 #pragma once
 enum LightFXCommand : unsigned int {
 	Initialize = 1,
-	Release,
 	Reset,
 	Update,
 	UpdateDefault,

@@ -1,4 +1,4 @@
-using Artemis.Core;
+﻿using Artemis.Core;
 using Artemis.Core.Modules;
 using Artemis.Plugins.Wrappers.Logitech.Modules.DataModels;
 using Artemis.Plugins.Wrappers.Logitech.Services;
@@ -13,12 +13,12 @@ namespace Artemis.Plugins.Wrappers.Logitech.Modules
     [PluginFeature(Name = "Logitech Wrapper Module")]
     public class LogitechWrapperModule : Module<LogitechWrapperDataModel>
     {
-        private readonly LogitechWrapperListenerService _wrapperService;
+        private readonly LogitechPipeListenerService _wrapperService;
         private readonly Dictionary<LedId, DynamicChild<SKColor>> _colorsCache = new();
 
         public override List<IModuleActivationRequirement> ActivationRequirements => null;
 
-        public LogitechWrapperModule(LogitechWrapperListenerService service)
+        public LogitechWrapperModule(LogitechPipeListenerService service)
         {
             _wrapperService = service;
         }

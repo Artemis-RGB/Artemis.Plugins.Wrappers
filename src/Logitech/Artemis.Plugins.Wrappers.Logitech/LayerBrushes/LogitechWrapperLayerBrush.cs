@@ -10,10 +10,10 @@ namespace Artemis.Plugins.Wrappers.Logitech.LayerBrushes
 {
     public class LogitechWrapperLayerBrush : PerLedLayerBrush<LogitechWrapperLayerPropertyGroup>
     {
-        private readonly LogitechWrapperListenerService _wrapperService;
+        private readonly LogitechPipeListenerService _wrapperService;
         private readonly Dictionary<LedId, SKColor> _colors = new();
 
-        public LogitechWrapperLayerBrush(LogitechWrapperListenerService wrapperService)
+        public LogitechWrapperLayerBrush(LogitechPipeListenerService wrapperService)
         {
             _wrapperService = wrapperService;
         }

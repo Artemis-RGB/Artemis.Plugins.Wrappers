@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Razer", "Razer", "{935CE250
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LightFx", "LightFx", "{DF271E73-6E98-4856-8C2C-3305DDB87391}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Artemis.Wrappers.Logitech", "Logitech\Artemis.Wrappers.Logitech\Artemis.Wrappers.Logitech.vcxproj", "{1909AA5B-A8DD-4218-838B-978F2B7033B8}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Artemis.Wrappers.LightFx", "LightFx\Artemis.Wrappers.LightFx\Artemis.Wrappers.LightFx.vcxproj", "{B61FE3A3-E524-4254-8F30-DF61897E6437}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Artemis.Wrappers.Razer", "Razer\Artemis.Wrappers.Razer\Artemis.Wrappers.Razer.vcxproj", "{A6AD301E-0812-4A57-BB6D-5E68F025A270}"
@@ -42,10 +40,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1909AA5B-A8DD-4218-838B-978F2B7033B8}.Debug|x64.ActiveCfg = Debug|x64
-		{1909AA5B-A8DD-4218-838B-978F2B7033B8}.Debug|x64.Build.0 = Debug|x64
-		{1909AA5B-A8DD-4218-838B-978F2B7033B8}.Release|x64.ActiveCfg = Release|x64
-		{1909AA5B-A8DD-4218-838B-978F2B7033B8}.Release|x64.Build.0 = Release|x64
 		{B61FE3A3-E524-4254-8F30-DF61897E6437}.Debug|x64.ActiveCfg = Debug|x64
 		{B61FE3A3-E524-4254-8F30-DF61897E6437}.Debug|x64.Build.0 = Debug|x64
 		{B61FE3A3-E524-4254-8F30-DF61897E6437}.Release|x64.ActiveCfg = Release|x64
@@ -75,7 +69,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1909AA5B-A8DD-4218-838B-978F2B7033B8} = {AC453A0B-6B4D-48AF-80FA-1176A0AC6569}
 		{B61FE3A3-E524-4254-8F30-DF61897E6437} = {DF271E73-6E98-4856-8C2C-3305DDB87391}
 		{A6AD301E-0812-4A57-BB6D-5E68F025A270} = {935CE250-EFAC-43CA-811B-19A23CDA64EB}
 		{7DFDB138-424A-427C-8B4B-F355802E476D} = {E9E6FC94-8599-4AC2-B886-0417C85A699F}
