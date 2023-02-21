@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Artemis.Plugins.Wrappers.Shared;
 
 namespace Artemis.Plugins.Wrappers.Razer.Services
 {

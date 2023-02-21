@@ -24,16 +24,16 @@ public sealed class PipeReader
         _buffer = new byte[_pipe.InBufferSize];
         _headerBuffer = new byte[4];
         _cancellationTokenSource = new();
-        _listenerTask = Task.Run(ReadLoop);
+        _listenerTask = Task.Run(ReadLoop, _cancellationTokenSource.Token);
     }
 
-    private async Task ReadLoop()
+    private void ReadLoop()
     {
         while (!_cancellationTokenSource.IsCancellationRequested && _pipe.IsConnected)
         {
             try
             {
-                await ReadAndDispatchPacketAsync();
+                ReadAndDispatchPacketAsync();
             }
             catch (Exception e)
             {
@@ -41,14 +41,21 @@ public sealed class PipeReader
             }
         }
 
-        await _pipe.DisposeAsync();
+        _pipe.Dispose();
         Disconnected?.Invoke(this, EventArgs.Empty);
     }
     
-    private async Task ReadAndDispatchPacketAsync()
+    /// <summary>
+    /// Note for future self: you'll want to make this async.
+    /// Don't because that will consume lots of cpu.
+    /// This is fine since it will only be running when the game is running.
+    /// The listener is still async since that is going to be sitting idle most of the time.
+    /// </summary>
+    private void ReadAndDispatchPacketAsync()
     {
-        if (await _pipe.ReadAsync(_headerBuffer, _cancellationTokenSource.Token) != 4)
-            throw new Exception("Pipe closed");
+        //if we don't read anything, return and let the loop handle the disconnect
+        if (_pipe.Read(_headerBuffer) != 4)
+            return;
 
         var dataLength = BitConverter.ToInt32(_headerBuffer);
 
@@ -64,10 +71,9 @@ public sealed class PipeReader
         int position = 0;
         do
         {
-            var bytesRead = await _pipe.ReadAsync(_buffer.AsMemory(position, dataLength - position),
-                _cancellationTokenSource.Token);
+            var bytesRead = _pipe.Read(_buffer.AsSpan(position, dataLength - position));
             if (bytesRead == 0)
-                throw new Exception("Pipe closed");
+                return;
             position += bytesRead;
                 
         } while (position < dataLength);

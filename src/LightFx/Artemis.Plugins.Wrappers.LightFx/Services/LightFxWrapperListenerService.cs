@@ -6,6 +6,7 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Artemis.Plugins.Wrappers.Shared;
 
 namespace Artemis.Plugins.Wrappers.LightFx.Services
 {

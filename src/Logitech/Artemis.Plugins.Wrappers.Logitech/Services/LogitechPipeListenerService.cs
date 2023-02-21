@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using Artemis.Plugins.Wrappers.Shared;
 
 namespace Artemis.Plugins.Wrappers.Logitech.Services
 {
@@ -91,27 +92,27 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
 
         private void SetLightingForKeyWithQuartzCode(ReadOnlySpan<byte> span)
         {
-            _logger.Information("SetLightingForKeyWithQuartzCode");
+            //_logger.Information("SetLightingForKeyWithQuartzCode");
         }
 
         private void RestoreLightingForKey(ReadOnlySpan<byte> span)
         {
-            _logger.Information("RestoreLightingForKey");
+            //_logger.Information("RestoreLightingForKey");
         }
 
         private void SaveLightingForKey(ReadOnlySpan<byte> span)
         {
-            _logger.Information("SaveLightingForKey");
+            //_logger.Information("SaveLightingForKey");
         }
 
         private void RestoreLighting(ReadOnlySpan<byte> span)
         {
-            _logger.Information("RestoreLighting");
+            //_logger.Information("RestoreLighting");
         }
 
         private void SaveLighting(ReadOnlySpan<byte> span)
         {
-            _logger.Information("SaveLighting");
+            //_logger.Information("SaveLighting");
         }
 
         private void SetLightingForTargetZone(ReadOnlySpan<byte> span)
@@ -121,7 +122,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             //r percentage
             //g percentage
             //b percentage
-            _logger.Information("SetLightingForTargetZone");
+            //_logger.Information("SetLightingForTargetZone");
         }
 
         private void Init(ReadOnlySpan<byte> span)
@@ -133,7 +134,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
         private void SetTargetDevice(ReadOnlySpan<byte> span)
         {
             DeviceType = (LogiSetTargetDeviceType)BitConverter.ToInt32(span);
-            _logger.Verbose("SetTargetDevice: {deviceType} ", DeviceType);
+            //_logger.Verbose("SetTargetDevice: {deviceType} ", DeviceType);
         }
 
         private void SetLighting(ReadOnlySpan<byte> span)
@@ -153,7 +154,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             }
             //todo: other device zone types
 
-            _logger.Verbose("SetLighting: {color}", color);
+            //_logger.Verbose("SetLighting: {color}", color);
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
@@ -168,7 +169,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                 _colors[idx] = color;
             }
 
-            _logger.Verbose("SetLightingForKeyWithKeyName: {keyName} ({keyNameIdx}) - {color}", keyName, keyNameIdx, color);
+            //_logger.Verbose("SetLightingForKeyWithKeyName: {keyName} ({keyNameIdx}) - {color}", keyName, keyNameIdx, color);
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
@@ -183,7 +184,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                 _colors[idx2] = color;
             }
 
-            _logger.Verbose("SetLightingForKeyWithScanCode: {scanCode} ({scanCodeIdx}) - {color}", scanCode, scanCodeIdx, color);
+            //_logger.Verbose("SetLightingForKeyWithScanCode: {scanCode} ({scanCodeIdx}) - {color}", scanCode, scanCodeIdx, color);
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
@@ -198,7 +199,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                 _colors[idx3] = color;
             }
 
-            _logger.Verbose("SetLightingForKeyWithHidCode: {hidCode} ({hidCodeIdx}) - {color}", hidCode, hidCodeIdx, color);
+            ////_logger.Verbose("SetLightingForKeyWithHidCode: {hidCode} ({hidCodeIdx}) - {color}", hidCode, hidCodeIdx, color);
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
@@ -213,7 +214,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                 }
             }
 
-            _logger.Verbose("SetLightingFromBitmap");
+            //_logger.Verbose("SetLightingFromBitmap");
 
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
@@ -230,7 +231,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                 if (!_excluded.Contains(excludedLedId))
                     _excluded.Add(excludedLedId);
             }
-            _logger.Verbose("ExcludeKeysFromBitmap");
+            //_logger.Verbose("ExcludeKeysFromBitmap");
         }
 
         public static SKColor FromSpan(ReadOnlySpan<byte> span) => new(span[0], span[1], span[2]);
