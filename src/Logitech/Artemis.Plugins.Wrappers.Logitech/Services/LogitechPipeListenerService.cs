@@ -75,6 +75,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                     case LogitechPipeCommand.SetLightingForKeyWithKeyName: SetLightingForKeyWithKeyName(span); break;
                     case LogitechPipeCommand.SetLightingForKeyWithScanCode: SetLightingForKeyWithScanCode(span); break;
                     case LogitechPipeCommand.SetLightingForKeyWithHidCode: SetLightingForKeyWithHidCode(span); break;
+                    case LogitechPipeCommand.SetLightingForKeyWithQuartzCode: SetLightingForKeyWithQuartzCode(span); break;
                     case LogitechPipeCommand.SetLightingFromBitmap: SetLightingFromBitmap(span); break;
                     case LogitechPipeCommand.ExcludeKeysFromBitmap: ExcludeKeysFromBitmap(span); break;
                     case LogitechPipeCommand.SetLightingForTargetZone: SetLightingForTargetZone(span); break;
@@ -86,6 +87,11 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                 }
             }
             _profiler.StopMeasurement("Process Command");
+        }
+
+        private void SetLightingForKeyWithQuartzCode(ReadOnlySpan<byte> span)
+        {
+            _logger.Information("SetLightingForKeyWithQuartzCode");
         }
 
         private void RestoreLightingForKey(ReadOnlySpan<byte> span)
@@ -110,6 +116,11 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
 
         private void SetLightingForTargetZone(ReadOnlySpan<byte> span)
         {
+            //zonetype
+            //zoneIdx
+            //r percentage
+            //g percentage
+            //b percentage
             _logger.Information("SetLightingForTargetZone");
         }
 
@@ -149,7 +160,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
         private void SetLightingForKeyWithKeyName(ReadOnlySpan<byte> span)
         {
             int keyNameIdx = BitConverter.ToInt32(span);
-            SKColor color = ReadPercentageColor(span);
+            SKColor color = ReadPercentageColor(span[4..]);
             LogitechLedId keyName = (LogitechLedId)keyNameIdx;
 
             if (LedMapping.LogitechLedIds.TryGetValue(keyName, out LedId idx))
@@ -164,7 +175,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
         private void SetLightingForKeyWithScanCode(ReadOnlySpan<byte> span)
         {
             int scanCodeIdx = BitConverter.ToInt32(span);
-            SKColor color = ReadPercentageColor(span);
+            SKColor color = ReadPercentageColor(span[4..]);
             DirectInputScanCode scanCode = (DirectInputScanCode)scanCodeIdx;
 
             if (LedMapping.DirectInputScanCodes.TryGetValue(scanCode, out LedId idx2))
@@ -179,7 +190,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
         private void SetLightingForKeyWithHidCode(ReadOnlySpan<byte> span)
         {
             int hidCodeIdx = BitConverter.ToInt32(span);
-            SKColor color = ReadPercentageColor(span);
+            SKColor color = ReadPercentageColor(span[4..]);
             HidCode hidCode = (HidCode)hidCodeIdx;
 
             if (LedMapping.HidCodes.TryGetValue(hidCode, out LedId idx3))

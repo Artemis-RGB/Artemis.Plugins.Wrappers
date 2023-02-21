@@ -20,6 +20,8 @@
     <ItemGroup>
         <Content Include="Scripts\patch-registry.ps1" CopyToOutputDirectory="PreserveNewest" />
         <Content Include="Scripts\unpatch-registry.ps1" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="x64\LogitechLed.dll" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="x86\LogitechLed.dll" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>
