@@ -56,7 +56,7 @@ FN_DECLSPEC LFX_RESULT STDCALL LFX_Initialize()
 		LOG("Program tried to initialize twice, returning success");
 		return LFX_SUCCESS;
 	}
-	if (program_name == "Artemis.UI.exe") {
+    if (program_name.contains("Artemis.UI")) {
 		LOG("Program name blacklisted, returning failure");
 		return LFX_FAILURE;
 	}

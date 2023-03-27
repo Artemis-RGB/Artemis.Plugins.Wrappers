@@ -71,7 +71,7 @@ extern "C" {
 		}
 
 		LOG("Init Called");
-		if (program_name != "Artemis.UI.exe") {
+    if (program_name.contains("Artemis.UI")) {
 			artemisPipeClient.Connect(L"\\\\.\\pipe\\Artemis\\Razer");
 
 			if (artemisPipeClient.IsConnected()) {
