@@ -97,6 +97,11 @@ public sealed class PipeListener : IDisposable
                 _tokenSource.Cancel();
                 try
                 {
+                    //dummy client to unblock the server
+                    using NamedPipeClientStream pipeStream = new(_pipeName);
+                    pipeStream.Connect(100);
+                    pipeStream.Close();
+                    
                     _task.Wait();
                 }
                 catch
