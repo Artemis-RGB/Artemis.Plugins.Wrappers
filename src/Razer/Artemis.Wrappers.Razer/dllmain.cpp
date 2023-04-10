@@ -71,7 +71,7 @@ extern "C" {
 		}
 
 		LOG("Init Called");
-		if (program_name != "Artemis.UI.exe") {
+    if (program_name.contains("Artemis.UI")) {
 			artemisPipeClient.Connect(L"\\\\.\\pipe\\Artemis\\Razer");
 
 			if (artemisPipeClient.IsConnected()) {
@@ -112,8 +112,6 @@ extern "C" {
 		if (!artemisPipeClient.IsConnected())
 			return RZRESULT_SERVICE_NOT_ACTIVE;
 
-		const auto buffer = RazerBuffer::create<RazerCommand::CommandUnInit>();
-		artemisPipeClient.Write(buffer.data(), buffer.size());
 		artemisPipeClient.Disconnect();
 		isInitialized = false;
 		return RZRESULT_SUCCESS;

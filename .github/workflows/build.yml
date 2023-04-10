@@ -7,10 +7,10 @@ jobs:
     runs-on: [windows-latest]
 
     steps:
-      - name: Setup .NET 6.0
+      - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '7.0.x'
           
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
@@ -20,9 +20,6 @@ jobs:
 
       - name: Build LightFx Wrapper dll
         run: MSBuild.exe src/LightFx/Artemis.Wrappers.LightFx/Artemis.Wrappers.LightFx.vcxproj /p:Platform=x64 /p:Configuration=Release
-
-      - name: Build Logitech Wrapper dll
-        run: MSBuild.exe src/Logitech/Artemis.Wrappers.Logitech/Artemis.Wrappers.Logitech.vcxproj /p:Platform=x64 /p:Configuration=Release
 
       - name: Build Razer Wrapper dll
         run: MSBuild.exe src/Razer/Artemis.Wrappers.Razer/Artemis.Wrappers.Razer.vcxproj /p:Platform=x64 /p:Configuration=Release

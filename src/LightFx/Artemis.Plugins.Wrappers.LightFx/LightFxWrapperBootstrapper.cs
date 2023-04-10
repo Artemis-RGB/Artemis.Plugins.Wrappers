@@ -1,8 +1,5 @@
 ﻿using Artemis.Core;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+using Artemis.Plugins.Wrappers.LightFx.Prerequisites;
 
 namespace Artemis.Plugins.Wrappers.LightFx
 {
@@ -10,7 +7,7 @@ namespace Artemis.Plugins.Wrappers.LightFx
     {
         public override void OnPluginLoaded(Plugin plugin)
         {
-            AddPluginPrerequisite(new WrapperDllsPrerequisite(plugin));
+            AddPluginPrerequisite(new LightFxWrapperPrerequisite(plugin));
         }
 
         public override void OnPluginEnabled(Plugin plugin)

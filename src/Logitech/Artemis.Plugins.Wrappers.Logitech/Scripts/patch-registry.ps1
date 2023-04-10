@@ -1,4 +1,4 @@
-﻿$key = $args[0]
+$key = $args[0]
 $value = $args[1]
 $keyParts = $key.Split('\')
 $keyName = $keyParts[-1].ToString()
@@ -13,13 +13,13 @@ if ($exists -eq $False) {
 }
 else {
 	# Back up the original value first
-	$originalValue = (Get-ItemProperty -Path $key).'(Default)'
+	$originalValue = (Get-Item -Path $key).GetValue('')
 	if ($originalValue -eq $value) {
 		Write-Output 'Already patched!'
 	}
  	else {
 		Set-ItemProperty -Path $key -Name Artemis -Value $originalValue
-		Set-ItemProperty -Path $key -Name '(Default)' -Value $value;
+		Set-Item -Path $key -Value $value
 	}
 }
 

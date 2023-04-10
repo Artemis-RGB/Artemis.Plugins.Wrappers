@@ -10,7 +10,7 @@ else {
 	# Put back the original value if found
 	if ($originalValue -ne $null) {
 		Write-Output 'Restoring original value'
-		Set-ItemProperty -Path $key -Name '(Default)' -Value $originalValue;
+		Set-Item -Path $key -Value $originalValue;
 		Remove-ItemProperty -Path $key -Name 'Artemis'
 	} 
 	# Otherwise get rid of the entire key

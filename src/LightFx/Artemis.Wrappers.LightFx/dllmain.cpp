@@ -56,7 +56,7 @@ FN_DECLSPEC LFX_RESULT STDCALL LFX_Initialize()
 		LOG("Program tried to initialize twice, returning success");
 		return LFX_SUCCESS;
 	}
-	if (program_name == "Artemis.UI.exe") {
+    if (program_name.contains("Artemis.UI")) {
 		LOG("Program name blacklisted, returning failure");
 		return LFX_FAILURE;
 	}
@@ -88,15 +88,7 @@ FN_DECLSPEC LFX_RESULT STDCALL LFX_Release()
 	}
 
 	if (artemisPipeClient.IsConnected()) {
-		LOG("Informing artemis and closing pipe...");
-
-		auto name = program_name.c_str();
-		unsigned int nameLength = (int)strlen(name) + 1;
-
-		const auto buffer = LightFxBuffer::create_dynamic<LightFXCommand::Release>(name, nameLength);
-
-		artemisPipeClient.Write(buffer.data(), buffer.size());
-
+		LOG("Closing pipe...");
 		artemisPipeClient.Disconnect();
 	}
 

@@ -34,14 +34,6 @@ public:
 			return;
 		}
 
-		DWORD mode = PIPE_READMODE_MESSAGE;
-		BOOL success = SetNamedPipeHandleState(_pipe, &mode, NULL, NULL);
-
-		if (!success) {
-			LOG("Failed setting pipe state");
-			return;
-		}
-
 		isConnected = TRUE;
 
 		LOG("Connected to pipe successfully");

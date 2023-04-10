@@ -3,7 +3,6 @@
     public enum LightFxCommand : uint
     {
         Initialize = 1,
-        Release,
         Reset,
         Update,
         UpdateDefault,
