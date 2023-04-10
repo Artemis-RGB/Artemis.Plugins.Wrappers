@@ -37,16 +37,16 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Artemis.Plugins.Wrappers.LightFx
-          path: src/LightFx/Artemis.Plugins.Wrappers.LightFx/bin/Release/net6.0-windows/publish
+          path: src/LightFx/Artemis.Plugins.Wrappers.LightFx/bin/Release/net7.0-windows/publish
 
       - name: Upload Logitech Wrapper
         uses: actions/upload-artifact@v2
         with:
           name: Artemis.Plugins.Wrappers.Logitech
-          path: src/Logitech/Artemis.Plugins.Wrappers.Logitech/bin/Release/net6.0-windows/publish
+          path: src/Logitech/Artemis.Plugins.Wrappers.Logitech/bin/Release/net7.0-windows/publish
 
       - name: Upload Razer Wrapper
         uses: actions/upload-artifact@v2
         with:
           name: Artemis.Plugins.Wrappers.Razer
-          path: src/Razer/Artemis.Plugins.Wrappers.Razer/bin/Release/net6.0-windows/publish
+          path: src/Razer/Artemis.Plugins.Wrappers.Razer/bin/Release/net7.0-windows/publish
