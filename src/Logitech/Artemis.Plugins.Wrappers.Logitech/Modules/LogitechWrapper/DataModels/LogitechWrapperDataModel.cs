@@ -1,4 +1,5 @@
-﻿using Artemis.Core.Modules;
+﻿using System;
+using Artemis.Core.Modules;
 using SkiaSharp;
 
 namespace Artemis.Plugins.Wrappers.Logitech.Modules.DataModels
@@ -7,5 +8,6 @@ namespace Artemis.Plugins.Wrappers.Logitech.Modules.DataModels
     {
         public SKColor BackgroundColor { get; set; }
         public LogitechKeysDataModel Keys { get; set; } = new();
+        public string CurrentApplication { get; set; } = String.Empty;
     }
 }

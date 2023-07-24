@@ -10,10 +10,10 @@ internal class LogitechWrapperPrerequisite : PluginPrerequisite
     private const string DLL_NAME = "LogitechLed.dll";
 
     private const string REGISTRY_PATH_64 =
-        "SOFTWARE\\Classes\\CLSID\\{a6519e67-7632-4375-afdf-caa889744403}\\ServerBinary";
+        @"SOFTWARE\Classes\CLSID\{a6519e67-7632-4375-afdf-caa889744403}\ServerBinary";
 
     private const string REGISTRY_PATH_32 =
-        "SOFTWARE\\Classes\\WOW6432Node\\CLSID\\{a6519e67-7632-4375-afdf-caa889744403}\\ServerBinary";
+        @"SOFTWARE\Classes\WOW6432Node\CLSID\{a6519e67-7632-4375-afdf-caa889744403}\ServerBinary";
 
     private readonly string _dllPath32;
     private readonly string _dllPath64;

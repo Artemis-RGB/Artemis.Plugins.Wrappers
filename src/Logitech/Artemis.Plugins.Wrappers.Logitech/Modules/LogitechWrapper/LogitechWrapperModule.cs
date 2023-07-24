@@ -7,6 +7,7 @@ using Serilog;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Artemis.Plugins.Wrappers.Logitech.Modules
 {
@@ -26,6 +27,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Modules
         public override void Enable()
         {
             _wrapperService.ColorsUpdated += WrapperServiceOnColorsUpdated;
+            _wrapperService.ClientConnected += WrapperServiceOnClientConnected;
             _wrapperService.ClientDisconnected += WrapperServiceOnClientDisconnected;
         }
 
@@ -53,8 +55,14 @@ namespace Artemis.Plugins.Wrappers.Logitech.Modules
             }
         }
 
+        private void WrapperServiceOnClientConnected(object sender, string e)
+        {
+            DataModel.CurrentApplication = Path.GetFileName(e);
+        }
+
         private void WrapperServiceOnClientDisconnected(object sender, EventArgs e)
         {
+            DataModel.CurrentApplication = string.Empty;
             DataModel.BackgroundColor = SKColor.Empty;
             DataModel.Keys.ClearDynamicChildren();
             _colorsCache.Clear();
