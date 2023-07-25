@@ -1,6 +1,5 @@
 ﻿using Artemis.Core;
 using Artemis.Core.Services;
-using Artemis.Plugins.Wrappers.Modules.Shared;
 using RGB.NET.Core;
 using Serilog;
 using SkiaSharp;
@@ -20,12 +19,15 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
         private readonly object _lock;
         private readonly Dictionary<LedId, SKColor> _colors;
         private readonly HashSet<LedId> _excluded;
+        private Dictionary<LedId, SKColor> _savedColors = new();
+        private SKColor _savedBackground = SKColor.Empty;
 
         public event EventHandler ColorsUpdated;
+        public event EventHandler<string> ClientConnected;
         public event EventHandler ClientDisconnected;
 
         public IReadOnlyDictionary<LedId, SKColor> Colors => _colors;
-        public SKColor BackgroundColor { get; private set; }
+        public SKColor BackgroundColor { get; private set; } = SKColor.Empty;
         public LogiSetTargetDeviceType DeviceType { get; private set; }
 
         public LogitechPipeListenerService(ILogger logger, Plugin plugin)
@@ -97,22 +99,52 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
 
         private void RestoreLightingForKey(ReadOnlySpan<byte> span)
         {
-            //_logger.Information("RestoreLightingForKey");
+            var key = (LogitechLedId)BitConverter.ToInt32(span);
+            if (!LedMapping.LogitechLedIds.TryGetValue(key, out var deviceKey))
+            {
+                return;
+            }
+
+            if (_savedColors.TryGetValue(deviceKey, out var savedColor))
+            {
+                _colors[deviceKey] = savedColor;
+            }
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            _logger.Information("RestoreLightingForKey");
         }
 
         private void SaveLightingForKey(ReadOnlySpan<byte> span)
         {
-            //_logger.Information("SaveLightingForKey");
+            var key = (LogitechLedId)BitConverter.ToInt32(span);
+            if (!LedMapping.LogitechLedIds.TryGetValue(key, out var deviceKey))
+            {
+                return;
+            }
+
+            BackgroundColor = _savedBackground;
+            if (_colors.TryGetValue(deviceKey, out var savedColor))
+            {
+                _savedColors[deviceKey] = savedColor;
+            }
+            _logger.Information("SaveLightingForKey");
         }
 
         private void RestoreLighting(ReadOnlySpan<byte> span)
         {
-            //_logger.Information("RestoreLighting");
+            BackgroundColor = _savedBackground;
+            foreach (var (key, value) in _savedColors)
+            {
+                _colors[key] = value;
+            }
+            ColorsUpdated?.Invoke(this, EventArgs.Empty);
+            _logger.Information("RestoreLighting");
         }
 
         private void SaveLighting(ReadOnlySpan<byte> span)
         {
-            //_logger.Information("SaveLighting");
+            _savedBackground = BackgroundColor;
+            _savedColors = new Dictionary<LedId, SKColor>(_colors);
+            _logger.Information("SaveLighting");
         }
 
         private void SetLightingForTargetZone(ReadOnlySpan<byte> span)
@@ -128,6 +160,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
         private void Init(ReadOnlySpan<byte> span)
         {
             var name = ReadNullTerminatedUnicodeString(span);
+            ClientConnected?.Invoke(this, name);
             _logger.Information("LogiLedInit: {name}", name);
         }
 
