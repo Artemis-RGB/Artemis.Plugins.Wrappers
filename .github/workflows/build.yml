@@ -8,15 +8,15 @@ jobs:
 
     steps:
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
           
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
 
       - name: Clone Plugins
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Build LightFx Wrapper dll
         run: MSBuild.exe src/LightFx/Artemis.Wrappers.LightFx/Artemis.Wrappers.LightFx.vcxproj /p:Platform=x64 /p:Configuration=Release
@@ -34,19 +34,19 @@ jobs:
         run: dotnet publish -c Release src/Razer/Artemis.Plugins.Wrappers.Razer/Artemis.Plugins.Wrappers.Razer.csproj
 
       - name: Upload LightFx Wrapper
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Artemis.Plugins.Wrappers.LightFx
           path: src/LightFx/Artemis.Plugins.Wrappers.LightFx/bin/Release/net7.0-windows/publish
 
       - name: Upload Logitech Wrapper
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Artemis.Plugins.Wrappers.Logitech
           path: src/Logitech/Artemis.Plugins.Wrappers.Logitech/bin/Release/net7.0-windows/publish
 
       - name: Upload Razer Wrapper
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Artemis.Plugins.Wrappers.Razer
           path: src/Razer/Artemis.Plugins.Wrappers.Razer/bin/Release/net7.0-windows/publish
