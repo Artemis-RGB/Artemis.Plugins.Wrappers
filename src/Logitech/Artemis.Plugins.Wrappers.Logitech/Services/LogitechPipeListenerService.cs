@@ -52,12 +52,12 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
 
         private void OnPipeListenerClientConnected(object sender, EventArgs e)
         {
-            _logger.Information("Logitech wrapper reader connected.");
+            _logger.Information("Logitech wrapper reader connected");
         }
 
         private void OnPipeListenerClientDisconnected(object sender, EventArgs e)
         {
-            _logger.Information("Logitech wrapper reader disconnected.");
+            _logger.Information("Logitech wrapper reader disconnected");
             ClearData();
             ClientDisconnected?.Invoke(this, EventArgs.Empty);
         }
@@ -86,7 +86,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                     case LogitechPipeCommand.RestoreLighting: RestoreLighting(span); break;
                     case LogitechPipeCommand.SaveLightingForKey: SaveLightingForKey(span); break;
                     case LogitechPipeCommand.RestoreLightingForKey: RestoreLightingForKey(span); break;
-                    default: _logger.Information("Unknown command id: {commandId}.", command); break;
+                    default: _logger.Debug("Unknown command id: {CommandId}", command); break;
                 }
             }
             _profiler.StopMeasurement("Process Command");
@@ -94,39 +94,33 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
 
         private void SetLightingForKeyWithQuartzCode(ReadOnlySpan<byte> span)
         {
-            //_logger.Information("SetLightingForKeyWithQuartzCode");
+            //_logger.Verbose("SetLightingForKeyWithQuartzCode");
         }
 
         private void RestoreLightingForKey(ReadOnlySpan<byte> span)
         {
             var key = (LogitechLedId)BitConverter.ToInt32(span);
             if (!LedMapping.LogitechLedIds.TryGetValue(key, out var deviceKey))
-            {
                 return;
-            }
 
             if (_savedColors.TryGetValue(deviceKey, out var savedColor))
-            {
                 _colors[deviceKey] = savedColor;
-            }
+            
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
-            _logger.Information("RestoreLightingForKey");
+            //_logger.Verbose("RestoreLightingForKey");
         }
 
         private void SaveLightingForKey(ReadOnlySpan<byte> span)
         {
             var key = (LogitechLedId)BitConverter.ToInt32(span);
             if (!LedMapping.LogitechLedIds.TryGetValue(key, out var deviceKey))
-            {
                 return;
-            }
 
             BackgroundColor = _savedBackground;
             if (_colors.TryGetValue(deviceKey, out var savedColor))
-            {
                 _savedColors[deviceKey] = savedColor;
-            }
-            _logger.Information("SaveLightingForKey");
+            
+            //_logger.Verbose("SaveLightingForKey");
         }
 
         private void RestoreLighting(ReadOnlySpan<byte> span)
@@ -137,14 +131,14 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
                 _colors[key] = value;
             }
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
-            _logger.Information("RestoreLighting");
+            //_logger.Verbose("RestoreLighting");
         }
 
         private void SaveLighting(ReadOnlySpan<byte> span)
         {
             _savedBackground = BackgroundColor;
             _savedColors = new Dictionary<LedId, SKColor>(_colors);
-            _logger.Information("SaveLighting");
+            //_logger.Verbose("SaveLighting");
         }
 
         private void SetLightingForTargetZone(ReadOnlySpan<byte> span)
@@ -154,20 +148,20 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             //r percentage
             //g percentage
             //b percentage
-            //_logger.Information("SetLightingForTargetZone");
+            //_logger.Verbose("SetLightingForTargetZone");
         }
 
         private void Init(ReadOnlySpan<byte> span)
         {
             var name = ReadNullTerminatedUnicodeString(span);
             ClientConnected?.Invoke(this, name);
-            _logger.Information("LogiLedInit: {name}", name);
+            _logger.Information("LogiLedInit: {Name}", name);
         }
 
         private void SetTargetDevice(ReadOnlySpan<byte> span)
         {
             DeviceType = (LogiSetTargetDeviceType)BitConverter.ToInt32(span);
-            //_logger.Verbose("SetTargetDevice: {deviceType} ", DeviceType);
+            //_logger.Verbose("SetTargetDevice: {DeviceType} ", DeviceType);
         }
 
         private void SetLighting(ReadOnlySpan<byte> span)
@@ -248,32 +242,27 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             }
 
             //_logger.Verbose("SetLightingFromBitmap");
-
             ColorsUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void ExcludeKeysFromBitmap(ReadOnlySpan<byte> span)
         {
             var excludedLedIds = MemoryMarshal.Cast<byte, int>(span);
-            for (int nextKeyIndex = 0; nextKeyIndex < span.Length; nextKeyIndex += 4)
+            foreach (var excludedLogitechLedId in excludedLedIds)
             {
-                var excludedLogitechLedId = (LogitechLedId)BitConverter.ToInt32(span.Slice(nextKeyIndex, 4));
-                if (!LedMapping.LogitechLedIds.TryGetValue(excludedLogitechLedId, out var excludedLedId))
+                if (!LedMapping.LogitechLedIds.TryGetValue((LogitechLedId)excludedLogitechLedId, out var excludedLedId))
                     continue;
 
-                if (!_excluded.Contains(excludedLedId))
-                    _excluded.Add(excludedLedId);
+                _excluded.Add(excludedLedId);
             }
             //_logger.Verbose("ExcludeKeysFromBitmap");
         }
-
-        public static SKColor FromSpan(ReadOnlySpan<byte> span) => new(span[0], span[1], span[2]);
 
         public static string ReadNullTerminatedUnicodeString(ReadOnlySpan<byte> bytes)
         {
             ReadOnlySpan<byte> unicodeNullTerminator = stackalloc byte[] { 0, 0 };
             
-            int nullTerminatorIndex = bytes.IndexOf(unicodeNullTerminator);
+            var nullTerminatorIndex = bytes.IndexOf(unicodeNullTerminator);
 
             if (nullTerminatorIndex == -1)
                 return "";
@@ -286,9 +275,9 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             if (bytes.Length != 12)
                 return SKColors.Empty;
             
-            int r = BitConverter.ToInt32(bytes.Slice(0, 4));
-            int g = BitConverter.ToInt32(bytes.Slice(4, 4));
-            int b = BitConverter.ToInt32(bytes.Slice(8, 4));
+            var r = BitConverter.ToInt32(bytes.Slice(0, 4));
+            var g = BitConverter.ToInt32(bytes.Slice(4, 4));
+            var b = BitConverter.ToInt32(bytes.Slice(8, 4));
             
             return new SKColor((byte)(r / 100d * 255d), (byte)(g / 100d * 255d), (byte)(b / 100d * 255d));
         }
