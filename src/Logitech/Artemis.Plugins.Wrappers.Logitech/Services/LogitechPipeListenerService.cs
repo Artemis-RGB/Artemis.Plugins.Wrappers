@@ -38,12 +38,17 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             _colors = new();
             _excluded = new();
 
-            _pipeListener = new("LGS_LED_SDK-00000001");
+            var id = WTSGetActiveConsoleSessionId();
+            var pipeName = $"LGS_LED_SDK-{id:00000000}";
+            _pipeListener = new(pipeName);
             _pipeListener.ClientConnected += OnPipeListenerClientConnected;
             _pipeListener.ClientDisconnected += OnPipeListenerClientDisconnected;
             _pipeListener.CommandReceived += OnPipeListenerCommandReceived;
             _pipeListener.Exception += OnPipeListenerException;
         }
+
+        [DllImport("kernel32.dll")]
+        private static extern uint WTSGetActiveConsoleSessionId();
 
         private void OnPipeListenerException(object sender, Exception e)
         {
