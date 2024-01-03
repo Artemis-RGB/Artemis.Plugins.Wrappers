@@ -39,8 +39,7 @@ namespace Artemis.Plugins.Wrappers.Logitech.Services
             _excluded = new();
 
             var id = WTSGetActiveConsoleSessionId();
-            var pipeName = "LGS_LED_SDK-" + id.ToString("x8");
-            _pipeListener = new(pipeName);
+            _pipeListener = new PipeListener($"LGS_LED_SDK-{id:x8}");
             _pipeListener.ClientConnected += OnPipeListenerClientConnected;
             _pipeListener.ClientDisconnected += OnPipeListenerClientDisconnected;
             _pipeListener.CommandReceived += OnPipeListenerCommandReceived;

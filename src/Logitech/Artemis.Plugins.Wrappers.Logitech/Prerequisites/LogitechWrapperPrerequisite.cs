@@ -51,11 +51,14 @@ internal class LogitechWrapperPrerequisite : PluginPrerequisite
 
     public override bool IsMet()
     {
-        using var key64 = Registry.LocalMachine.OpenSubKey(REGISTRY_PATH_64);
-        using var key32 = Registry.LocalMachine.OpenSubKey(REGISTRY_PATH_32);
+        var key64 = Registry.LocalMachine.OpenSubKey(REGISTRY_PATH_64);
+        var key32 = Registry.LocalMachine.OpenSubKey(REGISTRY_PATH_32);
 
         var is64BitKeyPresent = key64?.GetValue(null)?.ToString() == _dllPath64;
         var is32BitKeyPresent = key32?.GetValue(null)?.ToString() == _dllPath32;
+        
+        key64?.Dispose();
+        key32?.Dispose();
 
         return is64BitKeyPresent && is32BitKeyPresent;
     }
